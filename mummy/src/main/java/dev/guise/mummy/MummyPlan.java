@@ -144,6 +144,18 @@ public interface MummyPlan {
 	/// @return An artifact query for subsequent configuration and execution.
 	public ArtifactQuery queryArtifacts();
 
+	//# traversal
+
+	/// Walks the plan's artifact tree, visiting each artifact in depth-first pre-order.
+	///
+	/// @implSpec The default implementation delegates to [ArtifactTreeWalker#walk(Artifact, ArtifactTreeWalker.Visitor)]
+	/// with this plan's [root artifact][#getRootArtifact()].
+	/// @param visitor The visitor to invoke for each artifact.
+	/// @see ArtifactTreeWalker#walk(Artifact, ArtifactTreeWalker.Visitor)
+	public default void walk(final ArtifactTreeWalker.Visitor visitor) {
+		ArtifactTreeWalker.walk(getRootArtifact(), visitor);
+	}
+
 	//# generation
 
 	/// Returns a resource reference from one artifact to another in the source tree. The returned reference will be a relative URI path appropriate to be used as

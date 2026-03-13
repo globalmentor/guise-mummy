@@ -44,6 +44,7 @@ import io.confound.config.file.*;
 import dev.guise.mummy.deploy.*;
 import dev.guise.mummy.deploy.aws.*;
 import dev.guise.mummy.mummify.*;
+import dev.guise.mummy.plan.PlanDescriber;
 import dev.guise.mummy.mummify.collection.DirectoryMummifier;
 import dev.guise.mummy.mummify.image.ImageMummifier;
 import dev.guise.mummy.mummify.page.PageMummifier;
@@ -302,8 +303,8 @@ public class GuiseMummy implements Clogged {
 			context.setPlan(plan);
 
 			if(executions.contains(MummyExecution.DESCRIBE_PLAN)) {
-				new PlanDescriber(plan, toCollectionURI(rootArtifact.getTargetPath().toUri()), context.getSiteSourceDirectory())
-						.describeTo(System.out, isVerbose());
+				new PlanDescriber(plan, toCollectionURI(rootArtifact.getTargetPath().toUri()))
+						.describeTo(System.out, context.getSiteSourceDirectory(), isVerbose());
 			}
 
 			printArtifactDescription(context, rootArtifact);

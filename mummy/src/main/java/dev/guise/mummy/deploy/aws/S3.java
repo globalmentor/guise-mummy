@@ -16,6 +16,7 @@
 
 package dev.guise.mummy.deploy.aws;
 
+import static com.globalmentor.collections.Sets.*;
 import static com.globalmentor.collections.iterables.Iterables.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
@@ -385,7 +386,7 @@ public class S3 implements DeployTarget, Clogged {
 			planResource(context, rootTargetPathUri, artifact, resourceReference, contentArtifact.getTargetPath(), s3Key);
 		}));
 		if(artifact instanceof CompositeArtifact compositeArtifact) { // recurse into non-subsumed comprised artifacts
-			final Set<Artifact> subsumedArtifacts = Set.copyOf(compositeArtifact.getSubsumedArtifacts());
+			final Set<Artifact> subsumedArtifacts = toSet(compositeArtifact.getSubsumedArtifacts());
 			for(final Artifact comprisedArtifact : (Iterable<Artifact>)compositeArtifact.comprisedArtifacts()::iterator) {
 				if(!subsumedArtifacts.contains(comprisedArtifact)) { // a directory's content artifact is typically considered subsumed, is thus naturally skipped
 					plan(context, rootTargetPathUri, comprisedArtifact);

@@ -1,30 +1,34 @@
 # Plan: Flange Deploy Target
 
-Implement `Flange` as a `DeployTarget` within Guise Mummy's existing deployment plugin architecture, enabling site deployment to a Flange-managed AWS environment (S3 + CloudFront OAC + CloudFront KVS).
+Implement `FlangeWebSite` as a `DeployTarget` within Guise Mummy's existing deployment plugin architecture, enabling site deployment to a Flange-managed AWS environment (S3 + CloudFront OAC + CloudFront KVS).
 
 ## Overview
 
 **Chunk 1: Foundation** (independent — compiles and tests in isolation)
 
 - Step 1: Add Flange Maven dependencies to BOM and `mummy` module
-- Step 2: Redirect extraction utility — `FlangeDeployment.collectRedirects()`
-- Step 3: MetadataStrategy adapter — `FlangeDeployment.ArtifactMetadataStrategy`
-- Step 4: Collection content resource name derivation — `FlangeDeployment.deriveCollectionContentResourceName()`
+- Step 2: Site manifest — `FlangeWebSite.Manifest`
+- Step 3: MetadataStrategy adapter — `FlangeWebSite.ArtifactMetadataStrategy`
+- Step 4: Collection content resource name derivation — `FlangeWebSite.deriveCollectionContentResourceName()`
 - Step 5: Logging-based synchronization monitor
 
 **Chunk 2: Integration** (requires Chunk 1)
 
-- Step 6: `FlangeDeployment` deploy target class — constructor, `prepare()`, `deploy()`
-- Step 7: Register `Flange` in the deploy target factory switch in `GuiseMummy.mummify()`
-- Step 8: Unit tests for `FlangeDeployment`
+- Step 6: `FlangeWebSite` deploy target class — constructor, `prepare()`, `deploy()` (with `analyze` / `apply` subphases)
+- Step 7: Register `FlangeWebSite` in the deploy target factory switch in `GuiseMummy.mummify()`
+- Step 8: Unit tests for `FlangeWebSite`
 
 **Notable decisions:**
 
-- `Flange` is a standard `DeployTarget`, configured as `* Flange:` in `deploy.targets`. Coexists naturally with legacy targets — no special-case orchestration.
-- MetadataStrategy is a proper class (`ArtifactMetadataStrategy`) wrapping a `Map<Path, Artifact>` lookup from the in-memory plan, not sidecar I/O. Content types are stored as `MediaType` objects in the resource description (not strings).
-- Redirect extraction is factored as a static pure method for direct testing, parallel to `PlanDescriber.collectRedirect()`.
+- `FlangeWebSite` is a standard `DeployTarget`, configured as `* FlangeWebSite:` in `deploy.targets`. The name follows the Flange convention of "WebSite" (two words), consistent with `FlangePlatformAws.Templates.Exports.WEB_SITE_URL`. Coexists naturally with legacy targets — no special-case orchestration.
+- The artifact tree analysis is reified as a `FlangeWebSite.Manifest` record — a single tree walk producing both the redirect map and the artifact index. This eliminates the duplication of separate `collectRedirects()` and `buildArtifactIndex()` methods, provides a named concept for the aggregate ("what does the deployer need from this artifact tree?"), and shifts the test surface to the manifest composition rather than individual extractions. Parallels `PlanDescriber.describeTo()`, which also performs one walk with multiple accumulators.
+- `ArtifactMetadataStrategy` receives the pre-built `Map<Path, Artifact>` from the manifest rather than the root artifact — it no longer performs its own tree traversal.
+- Content types are stored as `MediaType` objects in the resource description (not strings). MetadataStrategy is a proper class, not a factory-returning-lambda.
 - Synchronization monitor uses SLF4J logging (equivalent to existing `S3` deploy target reporting). `CliStatus`-based progress is deferred to a future user-feedback overhaul.
 - Deploy URL is derived from the `WebSiteUrl` environment output via `FlangePlatformAws.Templates.Exports.WEB_SITE_URL` (transitively available from `flange-env-aws` → `flange-platform-aws`).
+- The artifact tree walk uses the "comprised − subsumed" pattern per the refactored `S3.plan()`, not the old full `comprisedArtifacts()` walk. This was informed by the double-redirect bug fix (`plans/2026-03-10-s3-collection-artifact-semantics.md`) and the architecture refinements around `DirectoryArtifact.findContentArtifact()`. Content-finding uses `DirectoryArtifact.findContentArtifact()`, not `CollectionArtifact.getSubsumedArtifacts()` — subsumption does not imply content designation.
+- `deploy()` is structured as two explicit subphases: **analyze** (walk the artifact tree, produce a `Manifest`) and **apply** (delegate to `AwsFlangeDeployer.deploySite()`). This aligns with a common deployment pattern observed across all deploy targets: `S3` has `plan()` (analyze) → `put()` + `prune()` (apply); `S3Website` extends both; `CloudFront` and `Route53` follow the same shape implicitly. TODO: converge existing deploy targets toward a common analyze/apply subphase vocabulary.
+- See also `artifact-tree-walking.md` for an analysis of all current tree walks and potential future unification.
 
 ---
 
@@ -76,85 +80,88 @@ _No changes needed._ The CLI already depends on `guise-mummy`, so the Flange cla
 
 ---
 
-## Step 2: Redirect Extraction — `collectRedirects()`
+## Step 2: Site Manifest — `FlangeWebSite.Manifest`
 
 ### Location
 
-Static method in `FlangeDeployment` (new class in `dev.guise.mummy.deploy.aws`).
+Package-private static nested record inside `FlangeWebSite` (new class in `dev.guise.mummy.deploy.aws`).
 
-### Signature
+### Design
+
+The manifest reifies the artifact tree analysis as a single, immutable record — encapsulating everything the deployer needs from the artifact tree in one traversal:
 
 ```java
-static Map<URIPath, URI> collectRedirects(final Artifact rootArtifact, final URI rootTargetPathUri)
+record Manifest(Map<URIPath, URI> redirects, Map<Path, Artifact> artifactsByContentPath) {
+    static Manifest of(final Artifact rootArtifact, final URI rootTargetPathUri) { ... }
+}
 ```
 
-### Logic
+`Manifest.of()` performs **one** walk of the artifact tree using the "comprised − subsumed" pattern, populating both maps simultaneously. This replaces the previously separate `collectRedirects()` and `buildArtifactIndex()` methods.
 
-Walk the artifact tree recursively using `CompositeArtifact.comprisedArtifacts()` (same traversal pattern as `S3.plan()`). For each artifact with a `mummy/altLocation` property:
+### Walk algorithm
+
+Walk the artifact tree recursively, visiting only non-subsumed comprised artifacts (same walk as the refactored `S3.plan()`; see architecture.md § "Choosing the Correct Walk"). For each artifact:
+
+**Redirect extraction** — If the artifact has a `mummy/altLocation` property (accessed via the artifact's `UrfResourceDescription`):
 
 1. Parse the `altLocation` value as `URIPath`.
-2. Resolve against `artifact.getTargetPath().toUri()` to produce an absolute filesystem URI. No `toCollectionURI` forcing is needed here because `collectRedirects()` runs during DEPLOY, after MUMMIFY has created the target tree — `Path.toUri()` already produces trailing-slash URIs for directories. (This is the same reason `S3Website.planResource()` uses the raw target path URI — both run during DEPLOY. By contrast, `PlanDescriber.collectRedirect()` runs during PLAN when directories don't exist and must apply `toCollectionURI` explicitly. See the architecture document's "Lifecycle Phase and `toCollectionURI`" section.)
+2. Resolve against `artifact.getTargetPath().toUri()` to produce an absolute filesystem URI. No `toCollectionURI` forcing is needed here because `Manifest.of()` runs during DEPLOY, after MUMMIFY has created the target tree — `Path.toUri()` already produces trailing-slash URIs for directories. (See the architecture document's "Lifecycle Phase and `toCollectionURI`" section.)
 3. Relativize against `rootTargetPathUri` to get the site-relative alt location `URIPath`.
 4. Check `isSubPath()` — skip if outside the site boundary (log a warning, don't throw).
 5. Compute the artifact's own site-relative resource reference via `Artifact.relativizeResourceReference(rootTargetPathUri, artifact)`. This method applies `toCollectionURI` defensively for `CollectionArtifact` instances — a no-op during DEPLOY since the trailing slash is already present, but it makes the API safe to call in any lifecycle phase.
-6. Store as `altLocationReference → resourceReference.toURI()` in the result map.
+6. Store as `altLocationReference → resourceReference.toURI()` in the redirects map.
+
+**Artifact index** — For each non-collection artifact, map `artifact.getTargetPath()` → `artifact`. For a `DirectoryArtifact`, map the content artifact's target path (via `DirectoryArtifact.findContentArtifact()`) → the directory artifact itself — because the artifact provides the metadata (via description delegation) while the content artifact provides the storage path. For a non-directory `CollectionArtifact` (if one ever appears), no entry is created — same as the `S3.plan()` behavior. An empty `DirectoryArtifact` (no content artifact) produces no index entry.
+
+If the artifact is a `CompositeArtifact`, recurse into its non-subsumed comprised artifacts.
+
+### Double-redirect avoidance
+
+Because the walk skips subsumed artifacts (e.g. a directory's `index.xhtml`), each `altLocation` is processed exactly once — at the collection artifact level, where `Artifact.relativizeResourceReference()` produces the canonical collection reference (e.g. `foo/`). This avoids the double-redirect bug that was fixed in `S3.plan()` (see `plans/2026-03-10-s3-collection-artifact-semantics.md` § Bug Description): if the walk visited subsumed content artifacts, their `altLocation` (inherited via `DirectoryArtifact` description delegation) would produce a redirect to the content path (e.g. `foo/index`) instead of the canonical collection path.
+
+### Path matching
+
+Guise Mummy guarantees that artifact target paths are real (canonical) paths, so no `toRealPath()` normalization is needed during index construction. `S3Synchronizer` canonicalizes the root directory via `toRealPath()` at entry, and `Files.list()` under that root produces canonical paths, so the paths will match.
+
+### Redirect validation
+
+The Flange deployer's `assembleSiteSettings()` validates that redirect sources are relative and within KVS quota. We don't need to duplicate that validation. We skip `altLocation` values that resolve outside the site boundary (not a sub-path of the root), logging a warning. The Flange deployer's `checkArgument(source.checkRelative())` would reject these anyway.
 
 This parallels the logic in `S3Website.planResource()`, adapted to produce the `Map<URIPath, URI>` that `AwsFlangeDeployer.deploySite()` expects. Both run during DEPLOY, so the same lifecycle assumptions apply. The existing code in `S3Website` throws an `IOException` for out-of-boundary alt locations, but since the Flange deployer's `assembleSiteSettings()` performs its own validation, we log a warning and skip instead.
 
 ### Testability
 
-Pure function — takes an artifact tree and a URI, returns a map. Testable with mock artifacts. The recursive tree walk is structural, but the per-artifact URI manipulation is the interesting part. Test cases:
-
-- Artifact with no `altLocation` → empty map.
-- File artifact with `altLocation` → correct site-relative key and value.
-- Collection artifact with `altLocation` → redirect target has collection form (trailing slash) via `Artifact.relativizeResourceReference()`.
-- `altLocation` outside site boundary → skipped with warning logged.
-
-### Design note
-
-The Flange deployer's `assembleSiteSettings()` validates that redirect sources are relative and within KVS quota. We don't need to duplicate that validation. We skip `altLocation` values that resolve outside the site boundary (not a sub-path of the root), logging a warning. The Flange deployer's `checkArgument(source.checkRelative())` would reject these anyway.
-
-### Note on artifact traversal
-
-The tree walk uses `CompositeArtifact.comprisedArtifacts()`, not `CollectionArtifact.getChildArtifacts()`. This is the same pattern as `S3.plan()`. The distinction matters: comprised artifacts include subsumed content artifacts (e.g., `index.html` as the content file for a directory), which can carry `altLocation` properties. The `S3.plan()` method calls `planResource()` for every artifact in the comprised tree, including content artifacts, and `S3Website.planResource()` checks each one for `altLocation`. Any discrepancies from the existing `S3` walk pattern should be noted during implementation — the Guise Mummy artifact model may be refinable in this area.
+Pure function — takes an artifact tree and a URI, returns a record with two maps. Testable with mock artifacts. The walk is structural, but the per-artifact logic (URI manipulation for redirects, path mapping for the index) is the interesting part. Test cases are consolidated in Step 8.
 
 ---
 
-## Step 3: MetadataStrategy Adapter — `ArtifactMetadataStrategy`
+## Step 3: MetadataStrategy Adapter — `FlangeWebSite.ArtifactMetadataStrategy`
 
 ### Location
 
-Static nested class within `FlangeDeployment`, implementing `S3Synchronizer.MetadataStrategy`.
+Static nested class within `FlangeWebSite`, implementing `S3Synchronizer.MetadataStrategy`.
 
 ### Design
 
-A proper class rather than a factory-returning-lambda. This makes the strategy directly constructable and testable.
+A proper class rather than a factory-returning-lambda. This makes the strategy directly constructable and testable. The constructor receives the pre-built artifact index from the manifest — it does **not** perform its own tree traversal.
 
 ```java
 static class ArtifactMetadataStrategy implements S3Synchronizer.MetadataStrategy {
 
-    private final Map<Path, Artifact> artifactsByTargetPath;
+    private final Map<Path, Artifact> artifactsByContentPath;
 
-    ArtifactMetadataStrategy(final Artifact rootArtifact) {
-        this.artifactsByTargetPath = buildArtifactIndex(rootArtifact);
+    ArtifactMetadataStrategy(final Map<Path, Artifact> artifactsByContentPath) {
+        this.artifactsByContentPath = requireNonNull(artifactsByContentPath);
     }
 
     @Override
     public Optional<S3Synchronizer.Metadata> findMetadata(
             final Path file, final SequencedSet<Algorithm> preferredHashAlgorithms) {
-        return Optional.ofNullable(artifactsByTargetPath.get(file))
+        return Optional.ofNullable(artifactsByContentPath.get(file))
                 .map(artifact -> toMetadata(artifact, preferredHashAlgorithms));
     }
 }
 ```
-
-The constructor takes the `rootArtifact` directly (the same `Artifact rootArtifact` passed to `DeployTarget.deploy()`), not the `MummyPlan`.
-
-### `buildArtifactIndex()`
-
-Static method that walks the artifact tree recursively via `CompositeArtifact.comprisedArtifacts()` (same traversal as `S3.plan()`). For each non-collection artifact, maps `artifact.getTargetPath()` → `artifact`. Returns an unmodifiable `Map<Path, Artifact>`.
-
-Guise Mummy guarantees that artifact target paths are real (canonical) paths, so no `toRealPath()` normalization is needed during index construction. `S3Synchronizer` canonicalizes the root directory via `toRealPath()` at entry, and `Files.list()` under that root produces canonical paths, so the paths will match.
 
 ### `toMetadata()`
 
@@ -173,14 +180,7 @@ Pure function — no I/O, no filesystem access.
 
 ### Thread safety
 
-The `Map` is built once and never modified. The artifact descriptions are read-only at this point in the lifecycle. `MetadataStrategy` implementations must be thread-safe per the interface contract; this implementation satisfies that.
-
-### Testability
-
-Both levels are directly unit-testable without a filesystem:
-
-- **`ArtifactMetadataStrategy`**: Construct with a root `Artifact` containing mock comprised artifacts with known target paths. Call `findMetadata()` with matching and non-matching paths. Verify lookup behavior.
-- **`toMetadata()`**: Construct a mock artifact with known resource description properties. Verify the `MediaType` cast, fingerprint extraction, and `Metadata` record construction.
+The `Map` is built once (in `Manifest.of()`) and never modified. The artifact descriptions are read-only at this point in the lifecycle. `MetadataStrategy` implementations must be thread-safe per the interface contract; this implementation satisfies that.
 
 ---
 
@@ -188,7 +188,7 @@ Both levels are directly unit-testable without a filesystem:
 
 ### Location
 
-Static method in `FlangeDeployment`.
+Static method in `FlangeWebSite`.
 
 ### Signature
 
@@ -198,7 +198,7 @@ static Optional<String> deriveCollectionContentResourceName(final Configuration 
 
 ### Logic
 
-Replicates the logic from `S3Website.deploy()` [lines 378-385](mummy/src/main/java/dev/guise/mummy/deploy/aws/S3Website.java#L378):
+Replicates the logic from `S3Website.deploy()` [lines 394-400](mummy/src/main/java/dev/guise/mummy/deploy/aws/S3Website.java#L394):
 
 1. Read `CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES` → take the first entry (e.g., `"index"`).
 2. Read `CONFIG_KEY_MUMMY_PAGE_NAMES_BARE` → if `true`, the resource name is the base name alone (e.g., `"index"`); if `false`, append `.html` (e.g., `"index.html"`).
@@ -214,7 +214,7 @@ Pure function of configuration values. Testable with a mock `Configuration`.
 
 ### Location
 
-Static nested class within `FlangeDeployment`: `FlangeDeployment.LoggingSynchronizationMonitor`.
+Static nested class within `FlangeWebSite`: `FlangeWebSite.LoggingSynchronizationMonitor`.
 
 ### Approach
 
@@ -259,16 +259,16 @@ This matches the reporting granularity of `S3.put()` (INFO per upload) and `S3.p
 
 ---
 
-## Step 6: `FlangeDeployment` Deploy Target Class
+## Step 6: `FlangeWebSite` Deploy Target Class
 
 ### Location
 
-New class: `mummy/src/main/java/dev/guise/mummy/deploy/aws/FlangeDeployment.java`
+New class: `mummy/src/main/java/dev/guise/mummy/deploy/aws/FlangeWebSite.java`
 
 ### Structure
 
 ```java
-public class FlangeDeployment implements DeployTarget, Clogged {
+public class FlangeWebSite implements DeployTarget, Clogged {
 
     // configuration key for the Flange environment name (section-local)
     public static final String CONFIG_KEY_ENVIRONMENT = "environment";
@@ -285,7 +285,7 @@ public class FlangeDeployment implements DeployTarget, Clogged {
 ### Constructor
 
 ```java
-public FlangeDeployment(final MummyContext context, final Configuration localConfiguration) {
+public FlangeWebSite(final MummyContext context, final Configuration localConfiguration) {
     this.optionalAwsProfile = context.getConfiguration()
             .findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE)
             .map(AwsProfile::new);
@@ -311,17 +311,27 @@ Returns `Set.of("https")` — Flange environments use CloudFront with HTTPS.
 
 ### `deploy(MummyContext context, Artifact rootArtifact)`
 
+Structured as two subphases — **analyze** and **apply** — following the common deployment pattern (see Notable Decisions).
+
+**Analyze:**
+
 1. Derive `collectionContentResourceName` from `context.getConfiguration()` (Step 4).
-2. Extract redirects from the artifact tree via `collectRedirects(rootArtifact, rootArtifact.getTargetPath().toUri())` (Step 2).
-3. Create the metadata strategy: `new ArtifactMetadataStrategy(rootArtifact)`.
+2. Build the manifest: `analyzeArtifacts(rootArtifact, rootArtifact.getTargetPath().toUri())` (Step 2).
+3. Create the metadata strategy: `new ArtifactMetadataStrategy(manifest.artifactsByContentPath())` (Step 3).
+
+**Apply:**
+
 4. Get `siteTargetDirectory` from `context.getSiteTargetDirectory()`.
 5. Create `AwsFlangeDeployer.forProfile(optionalAwsProfile)` within a try-with-resources.
-6. Call `deployer.deploySite(siteTargetDirectory, redirects, collectionContentResourceName, flangeEnv, metadataStrategy, LoggingSynchronizationMonitor::new)`.
-7. Return the deploy URL: `flangeEnv.findOutput(FlangePlatformAws.Templates.Exports.WEB_SITE_URL).map(URI::create)`, or `Optional.empty()` if not available.
+6. Call `deployer.deploySite(siteTargetDirectory, manifest.redirects(), collectionContentResourceName, flangeEnv, metadataStrategy, LoggingSynchronizationMonitor::new)`.
+
+**Return:** the deploy URL — `flangeEnv.findOutput(FlangePlatformAws.Templates.Exports.WEB_SITE_URL).map(URI::create)`, or `Optional.empty()` if not available.
+
+The analyze/apply split is currently just structural clarity within `deploy()` (comments and ordering), not separate methods. This positions the code for a future refactoring where `DeployTarget` might formalize these as subphase hooks, paralleling how `S3` already has `plan()` / `put()` / `prune()` as protected template methods.
 
 ### `AutoCloseable` consideration
 
-`AwsFlangeDeployer` and `AwsFlangeEnvironmentManager` are `AutoCloseable`. The `FlangeDeployment` target is created in `PREPARE_DEPLOY` and used in `DEPLOY`, then the orchestrator moves on. Currently `DeployTarget` does not extend `AutoCloseable`.
+`AwsFlangeDeployer` and `AwsFlangeEnvironmentManager` are `AutoCloseable`. The `FlangeWebSite` target is created in `PREPARE_DEPLOY` and used in `DEPLOY`, then the orchestrator moves on. Currently `DeployTarget` does not extend `AutoCloseable`.
 
 **Chosen approach:** Create resources locally within try-with-resources in each method. The env manager is only needed during `prepare()` and can be closed there. The deployer is only needed during `deploy()` and can be created and closed there. This keeps resource management tight and doesn't require `DeployTarget` to extend `AutoCloseable`.
 
@@ -335,23 +345,23 @@ Structure:
 
 ---
 
-## Step 7: Register `Flange` in Deploy Target Factory
+## Step 7: Register `FlangeWebSite` in Deploy Target Factory
 
 ### Location
 
-`GuiseMummy.mummify()`, in the deploy target type switch at [line ~335](mummy/src/main/java/dev/guise/mummy/GuiseMummy.java#L335).
+`GuiseMummy.mummify()`, in the deploy target type switch at [line ~341](mummy/src/main/java/dev/guise/mummy/GuiseMummy.java#L341).
 
 ### Change
 
 Add an `else if` branch:
 
 ```java
-} else if(targetType.equals("Flange")) {
-    target = new FlangeDeployment(context, targetSection);
+} else if(targetType.equals("FlangeWebSite")) {
+    target = new FlangeWebSite(context, targetSection);
 }
 ```
 
-This uses the string `"Flange"` as the target type name, matching the configuration `* Flange:` in TURF. This is the same pattern used for `CloudFront`, `S3`, and `S3Website`.
+This uses the string `"FlangeWebSite"` as the target type name, matching the configuration `* FlangeWebSite:` in TURF. This is the same pattern used for `CloudFront`, `S3`, and `S3Website`.
 
 ### Configuration example
 
@@ -361,7 +371,7 @@ deploy:
     profile = "myprofile"
   ;
   targets = [
-    * Flange:
+    * FlangeWebSite:
       environment = "prod"
   ]
 ;
@@ -376,7 +386,7 @@ deploy:
   targets = [
     * S3Website:
       region = "us-east-1"
-    * Flange:
+    * FlangeWebSite:
       environment = "prod"
   ]
 ;
@@ -386,7 +396,7 @@ Both will be instantiated, prepared, and deployed in sequence. This is the "natu
 
 ### Warning about DNS/altDomains
 
-The warning logic in `FlangeDeployment.prepare()` checks the global configuration for `deploy.dns` and `site.altDomains`. If `deploy.dns` is configured, it means DNS management is _also_ configured (possibly for the legacy target), but the Flange target doesn't handle DNS. The warning is advisory — it doesn't prevent deployment.
+The warning logic in `FlangeWebSite.prepare()` checks the global configuration for `deploy.dns` and `site.altDomains`. If `deploy.dns` is configured, it means DNS management is _also_ configured (possibly for the legacy target), but the Flange target doesn't handle DNS. The warning is advisory — it doesn't prevent deployment.
 
 ---
 
@@ -394,27 +404,39 @@ The warning logic in `FlangeDeployment.prepare()` checks the global configuratio
 
 ### Test class
 
-`mummy/src/test/java/dev/guise/mummy/deploy/aws/FlangeDeploymentTest.java`
+`mummy/src/test/java/dev/guise/mummy/deploy/aws/FlangeWebSiteTest.java`
 
 ### Tests
 
-#### `collectRedirects()`
-- **No alt locations**: artifact tree with no `mummy/altLocation` properties → empty map.
-- **Single file redirect**: artifact with `altLocation = "old-name.html"` → map with correct site-relative URIPath key and URI value.
-- **Collection redirect**: directory artifact with `altLocation = "old-dir/"` → redirect target has collection form (trailing slash).
+#### `Manifest.of()` (primary test surface)
+
+The manifest is the single point of artifact tree analysis. Testing the manifest tests both redirect extraction and artifact indexing as a composition.
+
+**Redirect behavior:**
+- **No alt locations**: artifact tree with no `mummy/altLocation` properties → `manifest.redirects()` is empty.
+- **Single file redirect**: artifact with `altLocation = "old-name.html"` → `manifest.redirects()` has correct site-relative URIPath key and URI value.
+- **Collection redirect**: directory artifact with `altLocation = "old-dir/"` → redirect target has collection form (trailing slash), not the content artifact path (e.g. `foo/` not `foo/index`).
 - **Alt location outside site boundary**: `altLocation` resolving outside root → skipped with no entry.
 - **Multiple redirects**: multiple artifacts with `altLocation` → all collected.
+- **Content artifact altLocation not duplicated**: directory artifact with content artifact sharing `altLocation` via description delegation → exactly one redirect entry at the collection level, not two.
 
-#### `ArtifactMetadataStrategy` (integration of index + lookup)
-- **Known path**: path matching an artifact in the plan → returns `Metadata` with correct content type and checksum.
-- **Unknown path**: path not in the plan → returns `Optional.empty()`.
-- **Collection artifact**: collection artifact path → not indexed (collections represent directories, not uploadable files).
-- **Multiple artifacts**: plan with several artifacts → each path maps to the correct artifact's metadata.
+**Index behavior:**
+- **File artifact**: indexed by its target path in `manifest.artifactsByContentPath()`.
+- **Directory artifact with content**: content artifact's target path maps to the directory artifact in the index. The directory path itself is not a key.
+- **Directory artifact without content (empty directory)**: no index entry.
+- **Multiple artifacts**: each path maps to the correct artifact.
+
+**Composition behavior:**
+- **Directory with both content and altLocation**: a `DirectoryArtifact` with a content artifact and an `altLocation` → the manifest contains *both* the correct redirect (keyed by the collection reference) *and* the correct index entry (keyed by the content artifact's target path).
 
 #### `ArtifactMetadataStrategy.toMetadata()` (per-artifact conversion)
 - **Content type and fingerprint present**: artifact with both `Content.TYPE_PROPERTY_TAG` (`MediaType`) and `Content.FINGERPRINT_PROPERTY_TAG` → `Metadata` with content type and SHA-256 checksum.
 - **Content type only**: artifact with `Content.TYPE_PROPERTY_TAG` but no fingerprint → `Metadata` with content type and empty checksums.
 - **No description properties**: artifact with empty description → `Metadata` with empty content type and empty checksums.
+
+#### `ArtifactMetadataStrategy.findMetadata()` (lookup via pre-built index)
+- **Known path**: construct `ArtifactMetadataStrategy` with a pre-built map, call `findMetadata()` with a matching path → returns `Metadata`.
+- **Unknown path**: path not in the map → returns `Optional.empty()`.
 
 #### `deriveCollectionContentResourceName()`
 - **Default index with HTML extension**: default config → `Optional.of("index.html")`.
@@ -435,12 +457,12 @@ The warning logic in `FlangeDeployment.prepare()` checks the global configuratio
 |---|---|
 | `pom.xml` (root BOM) | Add `flange-deploy-aws` and `flange-env-aws` to `<dependencyManagement>` |
 | `mummy/pom.xml` | Add `flange-deploy-aws` and `flange-env-aws` dependencies |
-| `mummy/src/main/java/dev/guise/mummy/deploy/aws/FlangeDeployment.java` | **New** — deploy target implementation |
-| `mummy/src/main/java/dev/guise/mummy/GuiseMummy.java` | Add `"Flange"` branch in deploy target factory switch |
-| `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
-| `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3Website.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
+| `mummy/src/main/java/dev/guise/mummy/deploy/aws/FlangeWebSite.java` | **New** — deploy target implementation (includes nested `Manifest` record, `ArtifactMetadataStrategy`, `LoggingSynchronizationMonitor`) |
+| `mummy/src/main/java/dev/guise/mummy/GuiseMummy.java` | Add `"FlangeWebSite"` branch in deploy target factory switch |
+| `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` (constructor delegation and encoding fix already applied in prior commit) |
+| `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3Website.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` (constructor delegation and encoding fix already applied in prior commit) |
 | `mummy/src/main/java/dev/guise/mummy/deploy/aws/CloudFront.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
-| `mummy/src/test/java/dev/guise/mummy/deploy/aws/FlangeDeploymentTest.java` | **New** — unit tests |
+| `mummy/src/test/java/dev/guise/mummy/deploy/aws/FlangeWebSiteTest.java` | **New** — unit tests |
 
 ---
 
@@ -452,7 +474,7 @@ The warning logic in `FlangeDeployment.prepare()` checks the global configuratio
 
 ### Flange environment as a project-level config vs. deploy target section-local config
 
-**Rejected:** Putting the Flange environment name at the project level (e.g., `flangeEnvironment = "prod"`). This would create a second, parallel mechanism for deployment configuration alongside `deploy.targets`. Keeping it section-local within `* Flange:` is consistent with how `S3Website` stores `region`, `bucket`, etc.
+**Rejected:** Putting the Flange environment name at the project level (e.g., `flangeEnvironment = "prod"`). This would create a second, parallel mechanism for deployment configuration alongside `deploy.targets`. Keeping it section-local within `* FlangeWebSite:` is consistent with how `S3Website` stores `region`, `bucket`, etc.
 
 ### Sidecar I/O metadata strategy vs. in-memory plan-based strategy
 
@@ -465,3 +487,7 @@ The warning logic in `FlangeDeployment.prepare()` checks the global configuratio
 ### `CliStatus`-based progress monitor vs. logging monitor
 
 **Deferred:** The Flange CLI's `SynchronizeStatus` extends `CliStatus<Path>` for a live progress bar with elapsed time, counters, and work-in-progress labels. However, `globalmentor-application` (which provides `CliStatus`) is not in the `mummy` module's dependency graph — it's only available in the `cli` module. Adding it as a dependency would couple the library to CLI infrastructure. A comprehensive overhaul of user feedback, logging, and ANSI styles is planned for the future; the `CliStatus` monitor can be revisited then. For now, the logging monitor provides equivalent reporting to the existing `S3` deploy target.
+
+### Separate `collectRedirects()` and `buildArtifactIndex()` methods vs. unified `Manifest`
+
+**Rejected:** The original plan factored redirect extraction and artifact indexing as separate static methods with their own tree walks, optimizing for single-responsibility testability. Both walk the same tree with the same "comprised − subsumed" pattern — the only difference is the per-artifact action. A single walk producing a reified `Manifest` record eliminates the duplication, provides a named concept for the aggregate ("what does the deployer need from this artifact tree?"), and shifts the test surface to the composition (the manifest) rather than the individual extractions. The `PlanDescriber.describeTo()` method already demonstrates this pattern — one walk, multiple accumulators.

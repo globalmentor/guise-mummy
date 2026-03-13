@@ -43,7 +43,7 @@ import io.urf.model.UrfResourceDescription;
 /// - **content artifact**: A special *subsumed artifact* of a directory that serves to represent its content. Historically the content artifact was `index.html`. Note that a content artifact is *not* a *child artifact* of its directory.
 /// - **corporeal artifact**: An artifact that potentially contains content, such as a [CorporealSourceArtifact].
 /// - **principal artifact**: An artifact that should be used as the canonical source and target for IRI path references. An artifact is normally its own principal artifact unless it is a *subsumed artifact* in which case the principal artifact is the one it is subsumed into and which should be used for IRI path references.
-/// - **subsumed artifact**: An artifact that has been subsumed into another one one and should not be visible as separate IRI path references. The archetypal subsumed artifact is the *content artifact* (historically `index.html`) of a directory.
+/// - **subsumed artifact**: An artifact that a *composite artifact* has absorbed as an implementation detail, making it not visible as a separate IRI path reference. Subsumption is a direct parent–child designation, not a transitive state — each composite independently declares which of its own comprised artifacts are subsumed. The archetypal subsumed artifact is the *content artifact* (historically `index.html`) of a directory.
 /// - **veiled artifact**: A resource that is available to be served to the user agent if access directly, but is not part of the normal navigation tree. Veiled artifacts are usually designated by some indication in the source filename, such as an underscore prefix.
 ///
 /// @author Garret Wilson

@@ -67,7 +67,7 @@ The `Artifact` interface defines a precise vocabulary documented in its Javadoc:
 
 - **Composite artifact** (`CompositeArtifact`) — An artifact potentially composed of other artifacts. Provides three methods that partition the constituent artifacts:
   - **`comprisedArtifacts()`** — _all_ constituent artifacts: the exhaustive set.
-  - **`getSubsumedArtifacts()`** — the subset of comprised artifacts that have been absorbed into the composite and should not appear as separate IRI path references. A subsumed artifact is an implementation detail of its parent; its _principal artifact_ is the composite that subsumed it.
+  - **`getSubsumedArtifacts()`** — the subset of comprised artifacts that the composite has absorbed as implementation details. A subsumed artifact should not appear as a separate IRI path reference; its _principal artifact_ is the composite that subsumed it. This designation is a direct parent–child relationship, not a transitive tree state.
   - The non-subsumed comprised artifacts — those that remain independently addressable. This set has no dedicated accessor; it is computed as `comprisedArtifacts()` minus `getSubsumedArtifacts()`.
 
 - **Collection artifact** (`CollectionArtifact extends CompositeArtifact`) — A composite artifact with a _collection IRI path reference_ (one ending in `/`). The canonical implementation is `DirectoryArtifact`. Adds `getChildArtifacts()`, which yields the navigable collection members — equivalent to the non-subsumed comprised artifacts for this type.
@@ -86,7 +86,7 @@ The `Artifact` interface defines a precise vocabulary documented in its Javadoc:
 
 ### Subsumption and Composite Walks
 
-Subsumption is a `CompositeArtifact`-level concept: a subsumed artifact has been absorbed into its parent and should not appear as an independent entity in the site's IRI space. This has direct implications for any code that recursively walks the artifact tree.
+Subsumption is a `CompositeArtifact`-level concept: a composite declares certain comprised artifacts as absorbed implementation details that should not appear as independent entities in the site's IRI space. This is a relational designation between a composite and its immediate children, not a transitive state — if a subsumed artifact is itself a composite, its own children are governed by their own parent's declarations, not by subsumption further up the tree. (Descendants of a subsumed artifact may be _unreachable_ in practice because their address derivation base has no independent IRI, but unreachability is a structural consequence, not a propagation of the subsumption designation.)
 
 The three `CompositeArtifact` methods partition comprised artifacts into two sets, and the correct walk method depends on what the walker intends to do with each artifact:
 
@@ -102,7 +102,7 @@ For `CollectionArtifact`, `getChildArtifacts()` is the convenience accessor for 
 
 Code that walks the artifact tree must choose between these methods based on intent:
 
-- **Navigation and plan display** (`PlanDescriber`): recurse into non-subsumed comprised artifacts only (`getChildArtifacts()` for collections). Subsumed artifacts are not independently addressable. The collection artifact itself carries the content artifact's description (via delegation), so metadata such as `altLocation` is processed once, at the collection level, with the correct collection resource reference.
+- **Navigation and plan display** (`PlanDescriber`): walk non-subsumed comprised artifacts via `ArtifactTreeWalker` (invoked through `MummyPlan.walk()`). Subsumed artifacts are visited with a `subsumed` flag but skipped by the visitor. The collection artifact itself carries the content artifact's description (via delegation), so metadata such as `altLocation` is processed once, at the collection level, with the correct collection resource reference.
 
 - **Deployment content upload** (`S3.plan()`): recurse into non-subsumed comprised artifacts only. For each artifact encountered, the deployer must upload its bytes and process its metadata (redirects, fingerprints). For a `DirectoryArtifact`, the bytes come from its designated content artifact — discovered via `DirectoryArtifact.findContentArtifact()` — while the metadata comes from the directory artifact itself (via description delegation). (Only `DirectoryArtifact` provides content artifact discovery; a non-directory `CollectionArtifact` would have no content to upload.) The deploy object's platform key (e.g. S3 key) is derived from the content artifact's resource reference (e.g. `foo/index`), but the model entity it carries is the collection artifact (e.g. `foo/`). This ensures metadata operations such as `altLocation` redirect resolution use the collection's canonical resource reference as the redirect target, and prevents the content artifact from being processed as an independent entity (which would produce duplicate redirects with incorrect targets).
 
@@ -160,7 +160,7 @@ This lifecycle dependence explains why different parts of the codebase handle th
 
 | Code | Phase | Uses `toCollectionURI`? | Why |
 |---|---|---|---|
-| `PlanDescriber.collectRedirect()` | PLAN | **Yes** — explicitly | Target dirs don't exist; compensation is required |
+| `PlanDescriber.findRedirect()` | PLAN | **Yes** — explicitly | Target dirs don't exist; compensation is required |
 | `AbstractMummyPlan.relativizeResourceReference()` | PLAN | **Yes** — via `forceCollection` parameter | Same reason |
 | `S3Website.planResource()` | DEPLOY | **No** — uses raw `artifact.getTargetPath().toUri()` | Target dirs exist; `Path.toUri()` already correct |
 | `Artifact.relativizeResourceReference()` | Any | **Yes** — defensively | Abstracts over lifecycle; safe to call in any phase |
@@ -431,7 +431,7 @@ The result is always a `URIPath`, not a `String`.
 
 The `mummy/altLocation` property is a **URI path reference** relative to the artifact declaring it (artifact-relative context). It specifies an alternate site location that should redirect to the artifact's actual location.
 
-Processing bridges the two relativization contexts: the artifact-relative input is resolved to an absolute filesystem URI, then re-relativized against the site root to produce a site-root-relative reference. The type chain in `S3Website.planResource()` and `PlanDescriber.collectRedirect()`:
+Processing bridges the two relativization contexts: the artifact-relative input is resolved to an absolute filesystem URI, then re-relativized against the site root to produce a site-root-relative reference. The type chain in `S3Website.planResource()` and `PlanDescriber.findRedirect()`:
 
 ```
 Object (URF property value)

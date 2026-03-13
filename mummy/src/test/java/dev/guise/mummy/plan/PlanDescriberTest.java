@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package dev.guise.mummy;
+package dev.guise.mummy.plan;
 
+import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.net.URIs.*;
 import static dev.guise.mummy.Artifact.*;
@@ -31,10 +32,13 @@ import java.util.*;
 import org.junit.jupiter.api.*;
 
 import com.globalmentor.net.URIPath;
+
+import dev.guise.mummy.*;
 import dev.guise.mummy.mummify.Mummifier;
 import dev.guise.mummy.mummify.collection.DirectoryArtifact;
 import dev.guise.mummy.mummify.image.ImageMummifier;
 import dev.guise.mummy.mummify.page.PageMummifier;
+import dev.guise.mummy.plan.PlanSummary.*;
 import io.urf.model.UrfObject;
 
 /// Tests of [PlanDescriber].
@@ -46,16 +50,90 @@ public class PlanDescriberTest {
 	private static final URI ROOT_TARGET_PATH_URI = toCollectionURI(TARGET_DIRECTORY.toUri());
 	private static final String NL = System.lineSeparator();
 
-	/// Creates a [PlanDescriber] with the standard test root target URI and source directory.
+	/// Creates a [PlanDescriber] with the standard test root target URI.
 	/// @param plan The plan to describe.
 	/// @return A new plan describer configured for testing.
 	private static PlanDescriber planDescriber(final MummyPlan plan) {
-		return new PlanDescriber(plan, ROOT_TARGET_PATH_URI, SOURCE_DIRECTORY);
+		return new PlanDescriber(plan, ROOT_TARGET_PATH_URI);
 	}
 
-	//## artifact classification and counting
+	//## `summarize()`
 
-	/// Tests that [PlanDescriber#describeTo(Appendable, boolean)] produces correct counts for a tree
+	/// Tests that [PlanDescriber#summarize()] classifies artifacts by mummifier type and collects redirects.
+	@Test
+	void testSummarizeClassifiesArtifactsAndCollectsRedirects() {
+		final Mummifier directoryMummifier = mock(Mummifier.class);
+		final PageMummifier pageMummifier = mock(PageMummifier.class);
+		final ImageMummifier imageMummifier = mock(ImageMummifier.class);
+		final Mummifier opaqueMummifier = mock(Mummifier.class);
+		final UrfObject redirectDescription = new UrfObject();
+		redirectDescription.setPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION, "old-page.html");
+		final Artifact page = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("about.html"), TARGET_DIRECTORY.resolve("about.html"));
+		final Artifact pageWithRedirect = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("new-page.html"), TARGET_DIRECTORY.resolve("new-page.html"),
+				redirectDescription);
+		final Artifact image = new DummyArtifact(imageMummifier, SOURCE_DIRECTORY.resolve("photo.jpg"), TARGET_DIRECTORY.resolve("photo.jpg"));
+		final Artifact opaque = new DummyArtifact(opaqueMummifier, SOURCE_DIRECTORY.resolve("data.json"), TARGET_DIRECTORY.resolve("data.json"));
+		final Artifact post = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("@2026-01-15-hello.html"),
+				TARGET_DIRECTORY.resolve("@2026-01-15-hello.html"));
+		final DirectoryArtifact root = new DirectoryArtifact(directoryMummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, null,
+				Set.of(page, pageWithRedirect, image, opaque, post));
+		final MummyPlan plan = new DefaultMummyPlan(root);
+		final PlanSummary summary = planDescriber(plan).summarize();
+		assertThat("page count includes pages and posts", summary.pageCount(), is(3L));
+		assertThat("collection count (root only)", summary.collectionCount(), is(1L));
+		assertThat("image count", summary.imageCount(), is(1L));
+		assertThat("other count", summary.otherCount(), is(1L));
+		assertThat("post count", summary.postCount(), is(1L));
+		assertThat("total is sum of categories", summary.totalCount(), is(6L));
+		assertThat("one redirect collected", summary.sortedRedirects(), hasSize(1));
+		assertThat("redirect alt location", summary.sortedRedirects().getFirst().altLocationReference().toString(), is("old-page.html"));
+	}
+
+	/// Tests that [PlanDescriber#summarize()] skips subsumed content artifacts.
+	@Test
+	void testSummarizeSkipsSubsumedArtifacts() {
+		final Mummifier directoryMummifier = mock(Mummifier.class);
+		final PageMummifier pageMummifier = mock(PageMummifier.class);
+		final Artifact contentArtifact = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("sub").resolve("index.html"),
+				TARGET_DIRECTORY.resolve("sub").resolve("index.html"));
+		final DirectoryArtifact subDir = new DirectoryArtifact(directoryMummifier, SOURCE_DIRECTORY.resolve("sub"), TARGET_DIRECTORY.resolve("sub"),
+				contentArtifact, Set.of());
+		final DirectoryArtifact root = new DirectoryArtifact(directoryMummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, null, Set.of(subDir));
+		final MummyPlan plan = new DefaultMummyPlan(root);
+		final PlanSummary summary = planDescriber(plan).summarize();
+		assertThat("content artifact is not counted as a page", summary.pageCount(), is(0L));
+		assertThat("two collections: root + sub", summary.collectionCount(), is(2L));
+		assertThat("total excludes subsumed content artifact", summary.totalCount(), is(2L));
+	}
+
+	//## `writeTo()`
+
+	/// Tests that [PlanDescriber#writeTo] formats a pre-constructed [PlanSummary] correctly,
+	/// independent of `summarize()`.
+	@Test
+	void testWriteToFormatsPreConstructedSummary() throws IOException {
+		final Mummifier mummifier = mock(Mummifier.class);
+		final DirectoryArtifact root = new DirectoryArtifact(mummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, null, Set.of());
+		final MummyPlan plan = new DefaultMummyPlan(root);
+		final var redirect = new RedirectEntry(URIPath.of("old.html"), URIPath.of("new.html"), false, Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE));
+		final PlanSummary summary = new PlanSummary(5, 2, 3, 1, 1, List.of(redirect));
+		final StringBuilder output = new StringBuilder();
+		planDescriber(plan).writeTo(output, SOURCE_DIRECTORY, summary, true);
+		final String result = output.toString();
+		assertThat("artifacts from summary, not from walk", result, containsString("Artifacts:    11"));
+		assertThat("pages", result, containsString("Pages:        5"));
+		assertThat("collections", result, containsString("Collections:  2"));
+		assertThat("images", result, containsString("Images:       3"));
+		assertThat("other", result, containsString("Other:        1"));
+		assertThat("posts", result, containsString("Posts:        1"));
+		assertThat("redirect count", result, containsString("Redirects:    1"));
+		assertThat("verbose shows redirect detail", result, containsString("    old.html -> new.html [!]" + NL));
+		assertThat("legend present", result, containsString("[!] redirect target is outside the site boundary"));
+	}
+
+	//## `describeTo()` (end-to-end via convenience method)
+
+	/// Tests that [PlanDescriber#describeTo(Appendable, Path, boolean)] produces correct counts for a tree
 	/// with pages, images, collections, and opaque files.
 	@Test
 	void testDescribeToClassifiesArtifactsByType() throws IOException {
@@ -70,7 +148,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, false);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
 		final String result = output.toString();
 		assertThat("total artifact count", result, containsString("Artifacts:    4"));
 		assertThat("page count", result, containsString("Pages:        1"));
@@ -93,7 +171,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, false);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
 		final String result = output.toString();
 		assertThat("total artifact count (root + sub + page)", result, containsString("Artifacts:    3"));
 		assertThat("collection count (root + sub)", result, containsString("Collections:  2"));
@@ -114,7 +192,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, false);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
 		final String result = output.toString();
 		assertThat("post count includes only post-filename artifacts", result, containsString("Posts:        1"));
 		assertThat("page count includes both post and non-post pages", result, containsString("Pages:        2"));
@@ -130,7 +208,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, false);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
 		assertThat("source path is the site source directory", output.toString(), containsString("Source:       " + SOURCE_DIRECTORY));
 	}
 
@@ -149,7 +227,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, false);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
 		final String result = output.toString();
 		assertThat("redirect count", result, containsString("Redirects:    1"));
 		assertThat("page redirect count", result, containsString("Page Targets:         1"));
@@ -171,7 +249,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, false);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
 		final String result = output.toString();
 		assertThat("redirect count", result, containsString("Redirects:    1"));
 		assertThat("collection redirect count", result, containsString("Collection Targets:   1"));
@@ -193,7 +271,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, true);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, true);
 		final String result = output.toString();
 		assertThat("verbose output includes redirect details header", result, containsString("Redirect Details:"));
 		assertThat("verbose output includes redirect mapping with -> arrow", result, containsString("    old-page.html -> new-page.html" + NL));
@@ -219,7 +297,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, true);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, true);
 		final String result = output.toString();
 		assertThat("2-byte UTF-8 decoded (Latin accented)", result, containsString("    caf\u00e9.html -> new-caf\u00e9.html" + NL));
 		assertThat("3-byte UTF-8 decoded (CJK)", result, containsString("    \u65e5\u8a18.html -> \u65b0\u65e5\u8a18.html" + NL));
@@ -234,7 +312,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, true);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, true);
 		assertThat("no redirect details when none exist", output.toString(), not(containsString("Redirect Details:")));
 	}
 
@@ -251,7 +329,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, false);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
 		assertThat("non-verbose output omits redirect details", output.toString(), not(containsString("Redirect Details:")));
 	}
 
@@ -270,7 +348,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, true);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, true);
 		final String result = output.toString();
 		assertThat("warning count shown in summary", result, containsString("Warnings:             1 [!]"));
 		assertThat("redirect detail shows out-of-site path with warning marker", result, containsString("    ../../outside.html -> page.html [!]" + NL));
@@ -290,35 +368,34 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, true);
+		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, true);
 		final String result = output.toString();
 		assertThat("no warning count line for in-site redirects", result, not(containsString("Warnings:")));
 		assertThat("no [!] marker for in-site redirects", result, not(containsString("[!]")));
 	}
 
-	//## `collectRedirect()`
+	//## `findRedirect()`
 
-	/// Tests that [PlanDescriber#collectRedirect(URI, Artifact, List)] extracts a page redirect entry.
+	/// Tests that [PlanDescriber#findRedirect(URI, Artifact)] extracts a page redirect entry.
 	@Test
-	void testCollectRedirectExtractsPageRedirect() {
+	void testFindRedirectExtractsPageRedirect() {
 		final PageMummifier pageMummifier = mock(PageMummifier.class);
 		final UrfObject description = new UrfObject();
 		description.setPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION, "old-page.html");
 		final Artifact page = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("new-page.html"), TARGET_DIRECTORY.resolve("new-page.html"), description);
-		final List<PlanDescriber.RedirectEntry> redirects = new ArrayList<>();
-		PlanDescriber.collectRedirect(ROOT_TARGET_PATH_URI, page, redirects);
-		assertThat("one redirect extracted", redirects, hasSize(1));
-		final var entry = redirects.getFirst();
+		final Optional<RedirectEntry> foundRedirect = PlanDescriber.findRedirect(ROOT_TARGET_PATH_URI, page);
+		assertThat("redirect found", foundRedirect, isPresentAnd(notNullValue()));
+		final var entry = foundRedirect.orElseThrow();
 		assertThat("alt location reference", entry.altLocationReference().toString(), is("old-page.html"));
 		assertThat("resource reference", entry.resourceReference().toString(), is("new-page.html"));
 		assertThat("not a collection redirect", entry.collection(), is(false));
 		assertThat("in-site redirect has no warning", entry.optionalWarning(), is(Optional.empty()));
 	}
 
-	/// Tests that [PlanDescriber#collectRedirect(URI, Artifact, List)] extracts a collection redirect
+	/// Tests that [PlanDescriber#findRedirect(URI, Artifact)] extracts a collection redirect
 	/// with trailing slash via [URIs#toCollectionURI(URI)].
 	@Test
-	void testCollectRedirectExtractsCollectionRedirect() {
+	void testFindRedirectExtractsCollectionRedirect() {
 		final Mummifier directoryMummifier = mock(Mummifier.class);
 		final PageMummifier pageMummifier = mock(PageMummifier.class);
 		final UrfObject contentDescription = new UrfObject();
@@ -327,48 +404,45 @@ public class PlanDescriberTest {
 				TARGET_DIRECTORY.resolve("new-section").resolve("index.html"), contentDescription);
 		final DirectoryArtifact dirWithRedirect = new DirectoryArtifact(directoryMummifier, SOURCE_DIRECTORY.resolve("new-section"),
 				TARGET_DIRECTORY.resolve("new-section"), contentArtifact, Set.of());
-		final List<PlanDescriber.RedirectEntry> redirects = new ArrayList<>();
-		PlanDescriber.collectRedirect(ROOT_TARGET_PATH_URI, dirWithRedirect, redirects);
-		assertThat("one redirect extracted", redirects, hasSize(1));
-		final var entry = redirects.getFirst();
+		final Optional<RedirectEntry> foundRedirect = PlanDescriber.findRedirect(ROOT_TARGET_PATH_URI, dirWithRedirect);
+		assertThat("redirect found", foundRedirect, isPresentAnd(notNullValue()));
+		final var entry = foundRedirect.orElseThrow();
 		assertThat("alt location reference for collection", entry.altLocationReference().toString(), is("old-section"));
 		assertThat("resource reference has trailing slash", entry.resourceReference().toString(), is("new-section/"));
 		assertThat("is a collection redirect", entry.collection(), is(true));
 		assertThat("in-site redirect has no warning", entry.optionalWarning(), is(Optional.empty()));
 	}
 
-	/// Tests that [PlanDescriber#collectRedirect(URI, Artifact, List)] flags out-of-site redirects.
+	/// Tests that [PlanDescriber#findRedirect(URI, Artifact)] flags out-of-site redirects.
 	@Test
-	void testCollectRedirectWarnsOnOutOfSiteRedirect() {
+	void testFindRedirectWarnsOnOutOfSiteRedirect() {
 		final PageMummifier pageMummifier = mock(PageMummifier.class);
 		final UrfObject description = new UrfObject();
 		description.setPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION, "../../outside.html");
 		final Artifact page = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("page.html"), TARGET_DIRECTORY.resolve("page.html"), description);
-		final List<PlanDescriber.RedirectEntry> redirects = new ArrayList<>();
-		PlanDescriber.collectRedirect(ROOT_TARGET_PATH_URI, page, redirects);
-		assertThat("one redirect extracted", redirects, hasSize(1));
-		assertThat("out-of-site redirect has warning", redirects.getFirst().optionalWarning().isPresent(), is(true));
+		final Optional<RedirectEntry> foundRedirect = PlanDescriber.findRedirect(ROOT_TARGET_PATH_URI, page);
+		assertThat("redirect found", foundRedirect, isPresentAnd(notNullValue()));
+		assertThat("out-of-site redirect has warning", foundRedirect.orElseThrow().optionalWarning().isPresent(), is(true));
 	}
 
-	/// Tests that [PlanDescriber#collectRedirect(URI, Artifact, List)] does nothing when no `altLocation` is declared.
+	/// Tests that [PlanDescriber#findRedirect(URI, Artifact)] returns empty when no `altLocation` is declared.
 	@Test
-	void testCollectRedirectIgnoresArtifactWithoutAltLocation() {
+	void testFindRedirectReturnsEmptyWithoutAltLocation() {
 		final PageMummifier pageMummifier = mock(PageMummifier.class);
 		final Artifact page = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("page.html"), TARGET_DIRECTORY.resolve("page.html"));
-		final List<PlanDescriber.RedirectEntry> redirects = new ArrayList<>();
-		PlanDescriber.collectRedirect(ROOT_TARGET_PATH_URI, page, redirects);
-		assertThat("no redirect for artifact without altLocation", redirects, is(empty()));
+		final Optional<RedirectEntry> foundRedirect = PlanDescriber.findRedirect(ROOT_TARGET_PATH_URI, page);
+		assertThat("no redirect for artifact without altLocation", foundRedirect, isEmpty());
 	}
 
 	//## `RedirectEntry` sorting
 
-	/// Tests that [PlanDescriber.RedirectEntry] sorts flat by decoded source path, case-insensitive.
+	/// Tests that [PlanSummary.RedirectEntry] sorts flat by decoded source path, case-insensitive.
 	@Test
 	void testRedirectEntrySorting() {
-		final var collectionB = new PlanDescriber.RedirectEntry(URIPath.of("beta/"), URIPath.of("new-beta/"), true, Optional.empty());
-		final var collectionA = new PlanDescriber.RedirectEntry(URIPath.of("alpha/"), URIPath.of("new-alpha/"), true, Optional.empty());
-		final var pageB = new PlanDescriber.RedirectEntry(URIPath.of("b-page.html"), URIPath.of("new-b.html"), false, Optional.empty());
-		final var pageA = new PlanDescriber.RedirectEntry(URIPath.of("a-page.html"), URIPath.of("new-a.html"), false, Optional.empty());
+		final var collectionB = new RedirectEntry(URIPath.of("beta/"), URIPath.of("new-beta/"), true, Optional.empty());
+		final var collectionA = new RedirectEntry(URIPath.of("alpha/"), URIPath.of("new-alpha/"), true, Optional.empty());
+		final var pageB = new RedirectEntry(URIPath.of("b-page.html"), URIPath.of("new-b.html"), false, Optional.empty());
+		final var pageA = new RedirectEntry(URIPath.of("a-page.html"), URIPath.of("new-a.html"), false, Optional.empty());
 		final var sorted = new ArrayList<>(List.of(pageB, collectionB, pageA, collectionA));
 		Collections.sort(sorted);
 		assertThat("sorted flat by decoded source path, case-insensitive", sorted, contains(pageA, collectionA, pageB, collectionB));
