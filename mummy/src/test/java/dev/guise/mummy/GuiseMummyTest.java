@@ -27,6 +27,7 @@ import org.junit.jupiter.api.*;
 
 import com.globalmentor.net.DomainName;
 
+import dev.guise.mummy.mummify.page.PageMummifier;
 import io.confound.config.*;
 
 /// Tests of [GuiseMummy].
@@ -149,6 +150,24 @@ public class GuiseMummyTest {
 		final Configuration configuration = new ObjectMapConfiguration(
 				Map.of(GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("example.com.", "www.example.com.", ".")));
 		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredSiteAltDomains(configuration));
+	}
+
+	//## mummy collection content
+
+	/// Tests for [GuiseMummy#findCollectionContentResourceName(Configuration)].
+	@Test
+	void testFindCollectionContentResourceName() {
+		assertThat("default index with HTML extension", GuiseMummy.findCollectionContentResourceName(
+				new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of("index")))), isPresentAndIs("index.html"));
+		assertThat("bare names",
+				GuiseMummy.findCollectionContentResourceName(new ObjectMapConfiguration(
+						Map.of(GuiseMummy.CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of("index"), PageMummifier.CONFIG_KEY_MUMMY_PAGE_NAMES_BARE, true))),
+				isPresentAndIs("index"));
+		assertThat("custom base name with extension", GuiseMummy.findCollectionContentResourceName(
+				new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of("default")))), isPresentAndIs("default.html"));
+		assertThat("empty collection content base names",
+				GuiseMummy.findCollectionContentResourceName(new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of()))),
+				is(Optional.empty()));
 	}
 
 }

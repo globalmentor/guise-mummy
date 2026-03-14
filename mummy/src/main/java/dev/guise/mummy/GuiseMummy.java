@@ -16,6 +16,7 @@
 
 package dev.guise.mummy;
 
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
@@ -196,6 +197,32 @@ public class GuiseMummy implements Clogged {
 	/// The configuration for the list of base filenames of files, in order of priority, that serve as content for a collection; defaults to
 	/// `["index"]`. During mummification, any content file discovered will be normalized (renamed if needed) to the first of these base filenames.
 	public static final String CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES = "mummy.collectionContentBaseNames";
+
+	/// Determines the normalized collection content resource name from the mummification configuration.
+	///
+	/// During mummification, collection (directory) content files are normalized to use the first entry from
+	/// [#CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES] as the base name, with the page filename extension
+	/// [PageMummifier#PAGE_FILENAME_EXTENSION] appended unless bare names are enabled via
+	/// [PageMummifier#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE]. This method derives that normalized filename from
+	/// the configuration without consulting the artifact tree.
+	///
+	/// @apiNote This is used by deploy targets and serving infrastructure to configure their "index document"
+	///          or "welcome file" settings. The value reflects a contract between mummification (which produces
+	///          collection content files with this name) and deployment (which must tell the serving
+	///          infrastructure what filename to expect).
+	/// @param configuration The mummification configuration.
+	/// @return The collection content resource name (e.g. `"index.html"` or `"index"`), or empty if no
+	///         collection content base names are configured.
+	/// @see #CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES
+	/// @see PageMummifier#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
+	/// @see PageMummifier#PAGE_FILENAME_EXTENSION
+	public static Optional<String> findCollectionContentResourceName(final Configuration configuration) {
+		return configuration.getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream().findFirst().map(baseName -> {
+			final boolean isNameBare = configuration.findBoolean(PageMummifier.CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
+			return isNameBare ? baseName : addExtension(baseName, PageMummifier.PAGE_FILENAME_EXTENSION);
+		});
+	}
+
 	/// The configuration for the base filename for navigation definition; defaults to `.navigation`.
 	public static final String CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME = "mummy.navigationBaseName";
 	/// The configuration for the base filename of a template; defaults to `.template`.

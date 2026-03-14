@@ -16,14 +16,13 @@ Implement `FlangeWebSite` as a `DeployTarget` within Guise Mummy's existing depl
 - Step 1: Add Flange Maven dependencies to BOM and `mummy` module
 - Step 2: Site manifest — `FlangeWebSite.Manifest`
 - Step 3: MetadataStrategy adapter — `FlangeWebSite.ArtifactMetadataStrategy`
-- Step 4: Collection content resource name derivation — `FlangeWebSite.deriveCollectionContentResourceName()`
-- Step 5: Logging-based synchronization monitor
+- Step 4: Logging-based synchronization monitor
 
 **Chunk 2: Integration** (requires Chunk 1)
 
-- Step 6: `FlangeWebSite` deploy target class — constructor, `prepare()`, `deploy()` (with `analyze` / `apply` subphases)
-- Step 7: Register `FlangeWebSite` in the deploy target factory switch in `GuiseMummy.mummify()`
-- Step 8: Unit tests for `FlangeWebSite`
+- Step 5: `FlangeWebSite` deploy target class — constructor, `prepare()`, `deploy()` (with `analyze` / `apply` subphases)
+- Step 6: Register `FlangeWebSite` in the deploy target factory switch in `GuiseMummy.mummify()`
+- Step 7: Unit tests for `FlangeWebSite`
 
 **Notable decisions:**
 
@@ -216,7 +215,7 @@ _No changes needed._ The CLI already depends on `guise-mummy`, so the Flange cla
 
 ### Location
 
-Package-private static nested record inside `FlangeWebSite` (new class in `dev.guise.mummy.deploy.aws`).
+Package-private static nested record inside `FlangeWebSite` (new class in `dev.guise.mummy.deploy.flange`).
 
 ### Design
 
@@ -227,7 +226,7 @@ record Manifest(Map<URIPath, URI> redirects, Map<Path, Artifact> artifactsByCont
 }
 ```
 
-The manifest does **not** perform its own tree walk. Instead, it is assembled by the deploy target's analyze phase (Step 6), which reuses `PlanDescriber.summarize(Visitor)` to piggyback a manifest-building visitor alongside the `PlanSummary` accumulation. After the walk completes:
+The manifest does **not** perform its own tree walk. Instead, it is assembled by the deploy target's analyze phase (Step 5), which reuses `PlanDescriber.summarize(Visitor)` to piggyback a manifest-building visitor alongside the `PlanSummary` accumulation. After the walk completes:
 
 1. The `PlanSummary` is received from `PlanDescriber.summarize()`.
 2. The redirect map (`Map<URIPath, URI>`) is extracted from the `PlanSummary`'s `sortedRedirects`, filtering out entries with warnings (out-of-site-boundary redirects) and mapping `RedirectEntry.sourcePath()` → `RedirectEntry.targetUri()`.
@@ -330,33 +329,7 @@ The `Map` is built once (in `Manifest.Builder.build()`) and never modified. The 
 
 ---
 
-## Step 4: Collection Content Resource Name Derivation
-
-### Location
-
-Static method in `FlangeWebSite`.
-
-### Signature
-
-```java
-static Optional<String> deriveCollectionContentResourceName(final Configuration configuration)
-```
-
-### Logic
-
-Replicates the logic from `S3Website.deploy()` [lines 394-400](mummy/src/main/java/dev/guise/mummy/deploy/aws/S3Website.java#L394):
-
-1. Read `CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES` → take the first entry (e.g., `"index"`).
-2. Read `CONFIG_KEY_MUMMY_PAGE_NAMES_BARE` → if `true`, the resource name is the base name alone (e.g., `"index"`); if `false`, append `.html` (e.g., `"index.html"`).
-3. Return `Optional.of(resourceName)` if a base name exists, `Optional.empty()` otherwise.
-
-### Testability
-
-Pure function of configuration values. Testable with a mock `Configuration`.
-
----
-
-## Step 5: Logging-Based Synchronization Monitor
+## Step 4: Logging-Based Synchronization Monitor
 
 ### Location
 
@@ -405,11 +378,11 @@ This matches the reporting granularity of `S3.put()` (INFO per upload) and `S3.p
 
 ---
 
-## Step 6: `FlangeWebSite` Deploy Target Class
+## Step 5: `FlangeWebSite` Deploy Target Class
 
 ### Location
 
-New class: `mummy/src/main/java/dev/guise/mummy/deploy/aws/FlangeWebSite.java`
+New class: `mummy/src/main/java/dev/guise/mummy/deploy/flange/FlangeWebSite.java`
 
 ### Structure
 
@@ -461,7 +434,7 @@ Structured as two subphases — **analyze** and **apply** — following the comm
 
 **Analyze:**
 
-1. Derive `collectionContentResourceName` from `context.getConfiguration()` (Step 4).
+1. Derive `collectionContentResourceName` via `GuiseMummy.findCollectionContentResourceName(context.getConfiguration())`.
 2. Create a `PlanDescriber` with the plan from `context.getPlan()` and `toCollectionURI(rootArtifact.getTargetPath().toUri())`.
 3. Create a `Manifest.Builder`.
 4. Call `planDescriber.summarize(manifestVisitor)` — the manifest visitor (a lambda that populates the `Manifest.Builder` with artifact content path entries per Step 2) runs alongside `PlanDescriber`'s summarization logic via `Visitor.andThen()`.
@@ -494,7 +467,7 @@ Structure:
 
 ---
 
-## Step 7: Register `FlangeWebSite` in Deploy Target Factory
+## Step 6: Register `FlangeWebSite` in Deploy Target Factory
 
 ### Location
 
@@ -549,11 +522,11 @@ The warning logic in `FlangeWebSite.prepare()` checks the global configuration f
 
 ---
 
-## Step 8: Unit Tests
+## Step 7: Unit Tests
 
 ### Test class
 
-`mummy/src/test/java/dev/guise/mummy/deploy/aws/FlangeWebSiteTest.java`
+`mummy/src/test/java/dev/guise/mummy/deploy/flange/FlangeWebSiteTest.java`
 
 ### Tests
 
@@ -587,12 +560,6 @@ The manifest is assembled by piggybacking on `PlanDescriber.summarize()`. Testin
 - **Known path**: construct `ArtifactMetadataStrategy` with a pre-built map, call `findMetadata()` with a matching path → returns `Metadata`.
 - **Unknown path**: path not in the map → returns `Optional.empty()`.
 
-#### `deriveCollectionContentResourceName()`
-- **Default index with HTML extension**: default config → `Optional.of("index.html")`.
-- **Bare names**: `mummy.page.namesBare = true` → `Optional.of("index")`.
-- **Empty collection content base names**: → `Optional.empty()`.
-- **Custom base name**: `collectionContentBaseNames = ["default"]`, not bare → `Optional.of("default.html")`.
-
 ### Not tested directly
 
 - `prepare()` and `deploy()` — these make AWS API calls. The components they delegate to (`AwsFlangeDeployer`, `AwsFlangeEnvironmentManager`) are already tested in the Flange project.
@@ -612,12 +579,12 @@ The manifest is assembled by piggybacking on `PlanDescriber.summarize()`. Testin
 | `mummy/src/test/java/dev/guise/mummy/ArtifactTreeWalkerTest.java` | Add `andThen()` test |
 | `pom.xml` (root BOM) | Add `flange-deploy-aws` and `flange-env-aws` to `<dependencyManagement>` |
 | `mummy/pom.xml` | Add `flange-deploy-aws` and `flange-env-aws` dependencies |
-| `mummy/src/main/java/dev/guise/mummy/deploy/aws/FlangeWebSite.java` | **New** — deploy target implementation (includes nested `Manifest` record + `Builder`, `ArtifactMetadataStrategy`, `LoggingSynchronizationMonitor`) |
-| `mummy/src/main/java/dev/guise/mummy/GuiseMummy.java` | Add `"FlangeWebSite"` branch in deploy target factory switch |
+| `mummy/src/main/java/dev/guise/mummy/deploy/flange/FlangeWebSite.java` | **New** — deploy target implementation (includes nested `Manifest` record + `Builder`, `ArtifactMetadataStrategy`, `LoggingSynchronizationMonitor`) |
+| `mummy/src/main/java/dev/guise/mummy/GuiseMummy.java` | Add `"FlangeWebSite"` branch in deploy target factory switch (import from `deploy.flange`) |
 | `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
 | `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3Website.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
 | `mummy/src/main/java/dev/guise/mummy/deploy/aws/CloudFront.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
-| `mummy/src/test/java/dev/guise/mummy/deploy/aws/FlangeWebSiteTest.java` | **New** — unit tests |
+| `mummy/src/test/java/dev/guise/mummy/deploy/flange/FlangeWebSiteTest.java` | **New** — unit tests |
 
 ---
 

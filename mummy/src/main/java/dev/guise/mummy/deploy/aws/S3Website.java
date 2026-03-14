@@ -16,14 +16,12 @@
 
 package dev.guise.mummy.deploy.aws;
 
-import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
 import static dev.guise.mummy.Artifact.*;
 import static dev.guise.mummy.GuiseMummy.*;
-import static dev.guise.mummy.mummify.page.PageMummifier.PAGE_FILENAME_EXTENSION;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
@@ -47,7 +45,6 @@ import com.globalmentor.text.StringTemplate;
 import io.confound.config.Configuration;
 import dev.guise.mummy.*;
 import dev.guise.mummy.deploy.ContentDeliveryTarget;
-import dev.guise.mummy.mummify.page.PageMummifier;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.regions.*;
 import software.amazon.awssdk.services.s3.*;
@@ -390,15 +387,10 @@ public class S3Website extends S3 {
 			}).collect(toCollection(LinkedHashSet::new)); //maintain order to help with debugging
 			final WebsiteConfiguration.Builder websiteConfigurationBuilder = WebsiteConfiguration.builder();
 
-			//set the index document, if any, based upon the collection content base name
-			final Collection<String> collectionContentBaseNames = configuration.getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class);
-			if(!collectionContentBaseNames.isEmpty()) {
-				final String indexDocumentBaseName = collectionContentBaseNames.iterator().next(); //e.g. "index" (mummification should have normalized to use the first one)
-				final boolean isNameBare = configuration.findBoolean(PageMummifier.CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
-				final String indexDocumentSuffix = isNameBare ? indexDocumentBaseName : addExtension(indexDocumentBaseName, PAGE_FILENAME_EXTENSION);
-				final IndexDocument indexDocument = IndexDocument.builder().suffix(indexDocumentSuffix).build();
-				websiteConfigurationBuilder.indexDocument(indexDocument);
-			}
+			//set the index document, if any, based upon the collection content resource name
+			findCollectionContentResourceName(configuration).ifPresent(indexDocumentSuffix -> {
+				websiteConfigurationBuilder.indexDocument(IndexDocument.builder().suffix(indexDocumentSuffix).build());
+			});
 			if(!routingRules.isEmpty()) {
 				websiteConfigurationBuilder.routingRules(routingRules.toArray(RoutingRule[]::new));
 			}

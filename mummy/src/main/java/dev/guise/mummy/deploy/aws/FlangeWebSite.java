@@ -16,10 +16,7 @@
 
 package dev.guise.mummy.deploy.aws;
 
-import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.util.Optionals.*;
-import static dev.guise.mummy.GuiseMummy.*;
-import static dev.guise.mummy.mummify.page.PageMummifier.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 
@@ -43,7 +40,6 @@ import dev.guise.mummy.mummify.collection.DirectoryArtifact;
 import dev.guise.mummy.plan.PlanSummary;
 
 import io.clogr.Clogged;
-import io.confound.config.Configuration;
 import io.urf.vocab.content.Content;
 
 /// Deploys a site to a [Flange](https://flange.dev/)-managed AWS environment (S3 + CloudFront OAC + CloudFront KVS).
@@ -181,26 +177,6 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 					.map(bytes -> Map.of(Mummifier.FINGERPRINT_ALGORITHM, Hash.of(bytes))).orElse(Map.of());
 			return new S3Synchronizer.Metadata(optionalContentType, checksums);
 		}
-	}
-
-	//## collection content resource name
-
-	/// Derives the collection content resource name from the mummification configuration.
-	///
-	/// @implSpec Replicates the logic from [S3Website#deploy]: reads the first entry from
-	///           [GuiseMummy#CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES], then appends the
-	///           [PageMummifier#PAGE_FILENAME_EXTENSION] unless [PageMummifier#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE] is `true`.
-	/// @param configuration The mummification configuration.
-	/// @return The collection content resource name (e.g. `"index.html"` or `"index"`), or empty if no
-	///         collection content base names are configured.
-	static Optional<String> deriveCollectionContentResourceName(final Configuration configuration) {
-		final Collection<String> collectionContentBaseNames = configuration.getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class);
-		if(collectionContentBaseNames.isEmpty()) {
-			return Optional.empty();
-		}
-		final String baseName = collectionContentBaseNames.iterator().next(); // mummification normalizes to use the first one
-		final boolean isNameBare = configuration.findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
-		return Optional.of(isNameBare ? baseName : addExtension(baseName, PAGE_FILENAME_EXTENSION));
 	}
 
 	//## synchronization monitor

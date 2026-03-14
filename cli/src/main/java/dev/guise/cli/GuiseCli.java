@@ -16,7 +16,6 @@
 
 package dev.guise.cli;
 
-import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.OperatingSystem.*;
@@ -49,7 +48,6 @@ import io.confound.config.Configuration;
 import dev.guise.catalina.webresources.SiteRoot;
 import dev.guise.mummy.*;
 import dev.guise.mummy.mummify.Mummifier;
-import dev.guise.mummy.mummify.page.PageMummifier;
 import picocli.CommandLine.*;
 
 /// Command-line interface for Guise tasks.
@@ -389,11 +387,8 @@ public class GuiseCli extends BaseCliApplication {
 		//TODO later add JSP servlet mappings
 		DEFAULT_MIME_TYPES_BY_FILENAME_EXTENSION.forEach((extension, mimeType) -> context.addMimeMapping(extension, mimeType));
 
-		//set up the collection content filenames (i.e "welcome files") such as `index`/`index.html`
-		final boolean isPageNameBare = projectConfiguration.findBoolean(PageMummifier.CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
-		projectConfiguration.getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream()
-				.map(baseName -> isPageNameBare ? baseName : addExtension(baseName, PageMummifier.PAGE_FILENAME_EXTENSION)) //e.g. "index" or "index.html"
-				.forEach(context::addWelcomeFile);
+		//set the collection content welcome file (e.g. `index.html` or `index` for bare names)
+		findCollectionContentResourceName(projectConfiguration).ifPresent(context::addWelcomeFile);
 
 		tomcat.start(); //start the server
 

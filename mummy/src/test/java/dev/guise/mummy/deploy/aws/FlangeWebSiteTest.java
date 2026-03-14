@@ -43,7 +43,6 @@ import dev.guise.mummy.mummify.collection.DirectoryArtifact;
 import dev.guise.mummy.mummify.page.PageMummifier;
 import dev.guise.mummy.plan.*;
 import dev.guise.mummy.plan.PlanSummary.*;
-import io.confound.config.*;
 import io.urf.model.UrfObject;
 import io.urf.vocab.content.Content;
 
@@ -232,23 +231,6 @@ class FlangeWebSiteTest {
 		final var strategy = new ArtifactMetadataStrategy(Map.of(knownPath, page));
 		assertThat("known path returns metadata", strategy.findMetadata(knownPath, new LinkedHashSet<>(List.of(SHA_256))).isPresent(), is(true));
 		assertThat("unknown path returns empty", strategy.findMetadata(unknownPath, new LinkedHashSet<>(List.of(SHA_256))).isPresent(), is(false));
-	}
-
-	//## `deriveCollectionContentResourceName()`
-
-	/// Tests for [FlangeWebSite#deriveCollectionContentResourceName].
-	@Test
-	void testDeriveCollectionContentResourceName() {
-		assertThat("default index with HTML extension", FlangeWebSite.deriveCollectionContentResourceName(
-				new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of("index")))), isPresentAndIs("index.html"));
-		assertThat("bare names",
-				FlangeWebSite.deriveCollectionContentResourceName(new ObjectMapConfiguration(
-						Map.of(GuiseMummy.CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of("index"), PageMummifier.CONFIG_KEY_MUMMY_PAGE_NAMES_BARE, true))),
-				isPresentAndIs("index"));
-		assertThat("custom base name with extension", FlangeWebSite.deriveCollectionContentResourceName(
-				new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of("default")))), isPresentAndIs("default.html"));
-		assertThat("empty collection content base names", FlangeWebSite.deriveCollectionContentResourceName(
-				new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of()))), is(Optional.empty()));
 	}
 
 }
