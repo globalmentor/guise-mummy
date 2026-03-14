@@ -17,6 +17,8 @@
 package dev.guise.mummy.deploy.flange;
 
 import static com.globalmentor.util.Optionals.*;
+import static dev.flange.platform.aws.FlangePlatformAws.Templates.Exports.*;
+import static dev.guise.mummy.GuiseMummy.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 
@@ -27,19 +29,26 @@ import java.util.*;
 
 import org.jspecify.annotations.*;
 
+import com.globalmentor.model.ConfiguredStateException;
 import com.globalmentor.net.*;
 import com.globalmentor.security.*;
 import com.globalmentor.security.MessageDigests.Algorithm;
 
+import dev.flange.aws.def.AwsProfile;
 import dev.flange.aws.s3.support.S3Synchronizer;
 import dev.flange.deploy.aws.AwsFlangeDeployer;
+import dev.flange.env.FlangeEnvironment;
+import dev.flange.env.aws.AwsFlangeEnvironment;
+import dev.flange.env.aws.AwsFlangeEnvironmentManager;
 import dev.guise.mummy.*;
 import dev.guise.mummy.deploy.DeployTarget;
+import dev.guise.mummy.deploy.aws.AWS;
 import dev.guise.mummy.mummify.Mummifier;
-import dev.guise.mummy.mummify.collection.DirectoryArtifact;
-import dev.guise.mummy.plan.PlanSummary;
+import dev.guise.mummy.mummify.collection.*;
+import dev.guise.mummy.plan.*;
 
 import io.clogr.Clogged;
+import io.confound.config.Configuration;
 import io.urf.vocab.content.Content;
 
 /// Deploys a site to a [Flange](https://flange.dev/)-managed AWS environment (S3 + CloudFront OAC + CloudFront KVS).
@@ -71,6 +80,19 @@ import io.urf.vocab.content.Content;
 /// 3. **[#deploy]** — analyzes the artifact tree via [dev.guise.mummy.plan.PlanDescriber], builds a
 ///    [Manifest], and delegates to [AwsFlangeDeployer#deploySite].
 ///
+/// @implSpec This deploy target does not manage DNS. A separately configured [dev.guise.mummy.deploy.Dns] such as
+///           [dev.guise.mummy.deploy.aws.Route53] can coexist: because [dev.guise.mummy.GuiseMummy] runs the
+///           [dev.guise.mummy.deploy.Dns] lifecycle independently, a [dev.guise.mummy.deploy.aws.Route53] instance
+///           will discover the Flange-created hosted zone and upsert its own resource records without interfering with
+///           this deploy target. Such records are not tracked by CloudFormation, so they survive environment updates but
+///           are also not cleaned up if later removed from the site configuration. If Flange itself adds support for
+///           additional DNS records in the future, the two sets of records could conflict.
+/// @implNote Unlike [dev.guise.mummy.deploy.aws.S3], which skips unsupported subsumed artifacts entirely during
+///           planning, this deploy target delegates file traversal to the
+///           [S3Synchronizer][dev.flange.aws.s3.support.S3Synchronizer], which uploads **all** files it encounters.
+///           Unsupported subsumed artifacts are therefore still uploaded, but with a default `application/octet-stream`
+///           content type. The synchronizer logs a missing-content-type warning on the initial upload only; subsequent
+///           syncs fall back to the content type already stored in S3.
 /// @see DeployTarget
 /// @see AwsFlangeDeployer
 public class FlangeWebSite implements DeployTarget, Clogged {
@@ -78,8 +100,20 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 	/// The section-relative configuration key for the Flange environment name.
 	public static final String CONFIG_KEY_ENVIRONMENT = "environment";
 
-	/// Placeholder no-args constructor; Chunk 2 will replace with the real constructor.
-	FlangeWebSite() {
+	private final Optional<AwsProfile> optionalAwsProfile;
+	private final FlangeEnvironment.Name envName;
+
+	/// Resolved during [#prepare]; used in [#deploy].
+	private AwsFlangeEnvironment flangeEnv;
+
+	/// Constructor.
+	/// @param context The context of static site generation.
+	/// @param localConfiguration The local configuration for this deployment target section.
+	/// @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
+	/// @see #CONFIG_KEY_ENVIRONMENT
+	public FlangeWebSite(final MummyContext context, final Configuration localConfiguration) {
+		this.optionalAwsProfile = context.getConfiguration().findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE).map(AwsProfile::new);
+		this.envName = new FlangeEnvironment.Name(localConfiguration.getString(CONFIG_KEY_ENVIRONMENT));
 	}
 
 	//## `Manifest`
@@ -92,36 +126,23 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 	///
 	/// @param redirects The redirect mappings (site-relative percent-encoded source path → target URI),
 	///        extracted from [PlanSummary#sortedRedirects] with warning entries filtered out.
-	/// @param artifactsByContentPath The artifact content path index: maps each artifact's filesystem content
-	///        path to the artifact that provides its metadata (via resource description delegation).
-	/// @implNote The index is keyed by **content file** path, not by the owning artifact's target path. The
-	///           [S3Synchronizer] iterates the target directory's files and queries the [ArtifactMetadataStrategy]
-	///           with each file path it encounters. For a [DirectoryArtifact], the file on disk is the content
-	///           artifact (e.g. `sub/index.html`), not the directory itself (`sub/`). The index maps that content
-	///           file path back to the owning directory artifact, which provides the authoritative metadata via
-	///           description delegation. This reverse lookup ensures the metadata returned to the synchronizer
-	///           reflects the collection artifact's properties, not those of the subsumed content artifact.
-	record Manifest(Map<URIPath, URI> redirects, Map<Path, Artifact> artifactsByContentPath) {
+	/// @param artifactsByTargetPath All artifacts encountered during the tree walk, indexed by their target path.
+	record Manifest(Map<URIPath, URI> redirects, Map<Path, Artifact> artifactsByTargetPath) {
 		/// Validation constructor.
 		/// @implSpec Defensively copies both maps to ensure immutability.
 		Manifest {
 			redirects = Map.copyOf(redirects);
-			artifactsByContentPath = Map.copyOf(artifactsByContentPath);
+			artifactsByTargetPath = Map.copyOf(artifactsByTargetPath);
 		}
 
 		/// Mutable accumulator for building a [Manifest] during the artifact tree walk.
 		static final class Builder {
-			private final Map<Path, Artifact> artifactsByContentPath = new HashMap<>();
+			private final Map<Path, Artifact> artifactsByTargetPath = new HashMap<>();
 
-			/// Adds an artifact to the content path index.
-			/// @apiNote For a [DirectoryArtifact], `contentPath` is the target path of the directory's
-			///          content artifact (e.g. `sub/index.html`), while `artifact` is the directory artifact
-			///          itself — because the directory provides the authoritative metadata via description
-			///          delegation. Non-collection artifacts are their own content, so both paths coincide.
-			/// @param contentPath The filesystem path to the artifact's content file.
-			/// @param artifact The artifact that provides metadata for this content path.
-			void addArtifact(final Path contentPath, final Artifact artifact) {
-				artifactsByContentPath.put(requireNonNull(contentPath), requireNonNull(artifact));
+			/// Adds an artifact to the target path index.
+			/// @param artifact The artifact to index.
+			void addArtifact(final Artifact artifact) {
+				artifactsByTargetPath.put(requireNonNull(artifact).getTargetPath(), artifact);
 			}
 
 			/// Builds the [Manifest] from the accumulated artifact index and the redirect data in the given [PlanSummary].
@@ -132,7 +153,7 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 			Manifest build(final PlanSummary summary) {
 				final Map<URIPath, URI> redirects = summary.sortedRedirects().stream().filter(entry -> entry.optionalWarning().isEmpty())
 						.collect(toMap(PlanSummary.RedirectEntry::sourcePath, PlanSummary.RedirectEntry::targetUri));
-				return new Manifest(redirects, artifactsByContentPath);
+				return new Manifest(redirects, artifactsByTargetPath);
 			}
 		}
 	}
@@ -142,24 +163,46 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 	/// Adapts Guise Mummy artifact metadata (content type and fingerprint from [io.urf.model.UrfResourceDescription])
 	/// to the [S3Synchronizer.MetadataStrategy] contract required by [AwsFlangeDeployer#deploySite].
 	///
-	/// The strategy looks up artifacts by their filesystem content path in a pre-built index from the [Manifest].
-	/// It does not perform its own tree traversal.
+	/// Artifacts are looked up by target path from a pre-built [Manifest] index and resolved through
+	/// [MummyPlan#getPrincipalArtifact] to ensure subsumed artifacts (e.g. directory content) yield the
+	/// principal artifact's metadata.
 	///
 	/// @implNote Thread-safe: the backing map is built once (in [Manifest.Builder#build]) and never modified.
 	///           Artifact descriptions are read-only at this point in the lifecycle.
-	static class ArtifactMetadataStrategy implements S3Synchronizer.MetadataStrategy {
+	static class ArtifactMetadataStrategy implements S3Synchronizer.MetadataStrategy, Clogged {
 
-		private final Map<Path, Artifact> artifactsByContentPath;
+		private final MummyPlan plan;
+		private final Map<Path, Artifact> artifactsByTargetPath;
 
 		/// Constructor.
-		/// @param artifactsByContentPath The pre-built artifact content path index from a [Manifest].
-		ArtifactMetadataStrategy(final Map<Path, Artifact> artifactsByContentPath) {
-			this.artifactsByContentPath = requireNonNull(artifactsByContentPath);
+		/// @param plan The mummy plan, used to resolve principal artifacts.
+		/// @param artifactsByTargetPath The pre-built artifact target path index from a [Manifest].
+		ArtifactMetadataStrategy(final MummyPlan plan, final Map<Path, Artifact> artifactsByTargetPath) {
+			this.plan = requireNonNull(plan);
+			this.artifactsByTargetPath = requireNonNull(artifactsByTargetPath);
 		}
 
+		/// {@inheritDoc}
+		/// @implSpec Looks up the artifact for the given file path, then resolves it to its
+		///           [principal artifact][MummyPlan#getPrincipalArtifact]. If the artifact is its own principal
+		///           (non-subsumed), its metadata is returned directly. If its principal is a [DirectoryArtifact]
+		///           whose content artifact matches, the directory's metadata is returned. For any other subsumed
+		///           artifact type, a warning is logged and empty is returned — deployment of such artifacts is
+		///           not yet supported.
 		@Override
 		public Optional<S3Synchronizer.Metadata> findMetadata(final Path file, final SequencedSet<Algorithm> preferredHashAlgorithms) {
-			return Optional.ofNullable(artifactsByContentPath.get(file)).map(artifact -> toMetadata(artifact, preferredHashAlgorithms));
+			return Optional.ofNullable(artifactsByTargetPath.get(file)).flatMap(artifact -> {
+				final Artifact principalArtifact = plan.getPrincipalArtifact(artifact);
+				if(principalArtifact.equals(artifact)) { // non-subsumed artifact — use its own metadata
+					return Optional.of(artifact);
+				}
+				if(principalArtifact instanceof DirectoryArtifact directoryArtifact // subsumed directory content — use directory's metadata
+						&& directoryArtifact.findContentArtifact().filter(artifact::equals).isPresent()) {
+					return Optional.of(principalArtifact);
+				}
+				getLogger().atWarn().log("Skipping metadata for subsumed artifact `{}`; only directory content artifacts are supported.", file);
+				return Optional.empty();
+			}).map(artifact -> toMetadata(artifact, preferredHashAlgorithms));
 		}
 
 		/// Converts an artifact's resource description properties into [S3Synchronizer.Metadata].
@@ -241,7 +284,7 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 		}
 	}
 
-	//## `DeployTarget` implementation stubs — Chunk 2 will provide the full implementation.
+	//## `DeployTarget` implementation
 
 	@Override
 	public Set<String> getSupportedProtocols() {
@@ -250,12 +293,39 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 
 	@Override
 	public void prepare(@NonNull final MummyContext context) throws IOException {
-		throw new UnsupportedOperationException("FlangeWebSite.prepare() is not yet implemented (Chunk 2).");
+		getLogger().atInfo().log("Resolving Flange environment `{}` (AWS profile: {}) ...", envName, optionalAwsProfile.map(AwsProfile::value).orElse("<default>"));
+		try (final var envManager = AwsFlangeEnvironmentManager.forProfile(optionalAwsProfile)) {
+			this.flangeEnv = envManager.resolve(envName)
+					.orElseThrow(() -> new ConfiguredStateException("Flange environment `%s` does not exist.".formatted(envName)));
+		}
+		flangeEnv.findSiteBucketName().orElseThrow(() -> new ConfiguredStateException(
+				"Environment `%s` is not configured for site deployment (missing output `%s`).".formatted(envName, SITE_BUCKET_NAME)));
+		flangeEnv.findSiteDistributionId().orElseThrow(() -> new ConfiguredStateException(
+				"Environment `%s` is not configured for site deployment (missing output `%s`).".formatted(envName, SITE_DISTRIBUTION_ID)));
+		flangeEnv.findSiteKeyValueStoreArn().orElseThrow(
+				() -> new ConfiguredStateException("Environment `%s` is not configured for site settings (missing output `%s`). Reprovision the environment."
+						.formatted(envName, SITE_KEY_VALUE_STORE_ARN)));
+		if(context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class).isPresent()) {
+			getLogger().atWarn().log("Alternative domain redirects (`{}`) are not supported with Flange deployment; ignoring.", CONFIG_KEY_SITE_ALT_DOMAINS);
+		}
 	}
 
 	@Override
 	public Optional<URI> deploy(@NonNull final MummyContext context, @NonNull final Artifact rootArtifact) throws IOException {
-		throw new UnsupportedOperationException("FlangeWebSite.deploy() is not yet implemented (Chunk 2).");
+		//## analyze
+		final Optional<String> foundCollectionContentResourceName = findCollectionContentResourceName(context.getConfiguration());
+		final var planDescriber = new PlanDescriber(context.getPlan());
+		final var manifestBuilder = new Manifest.Builder();
+		final PlanSummary summary = planDescriber.summarize((artifact, _) -> manifestBuilder.addArtifact(artifact));
+		final Manifest manifest = manifestBuilder.build(summary);
+		final var metadataStrategy = new ArtifactMetadataStrategy(context.getPlan(), manifest.artifactsByTargetPath());
+		//## apply
+		final Path siteTargetDirectory = context.getSiteTargetDirectory();
+		try (final var deployer = AwsFlangeDeployer.forProfile(optionalAwsProfile)) {
+			deployer.deploySite(siteTargetDirectory, manifest.redirects(), foundCollectionContentResourceName, flangeEnv, metadataStrategy,
+					LoggingSynchronizationMonitor::new);
+		}
+		return flangeEnv.findOutput(WEB_SITE_URL).map(URI::create);
 	}
 
 }

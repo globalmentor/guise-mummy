@@ -50,11 +50,11 @@ public class PlanDescriberTest {
 	private static final URI ROOT_TARGET_PATH_URI = toCollectionURI(TARGET_DIRECTORY.toUri());
 	private static final String NL = System.lineSeparator();
 
-	/// Creates a [PlanDescriber] with the standard test root target URI.
+	/// Creates a [PlanDescriber] for testing.
 	/// @param plan The plan to describe.
 	/// @return A new plan describer configured for testing.
 	private static PlanDescriber planDescriber(final MummyPlan plan) {
-		return new PlanDescriber(plan, ROOT_TARGET_PATH_URI);
+		return new PlanDescriber(plan);
 	}
 
 	//## `summarize()`
@@ -135,7 +135,7 @@ public class PlanDescriberTest {
 		final var redirect = new RedirectEntry(URIPath.of("old.html"), URI.create("new.html"), Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE));
 		final PlanSummary summary = new PlanSummary(5, 2, 3, 1, 1, List.of(redirect));
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).writeTo(output, SOURCE_DIRECTORY, summary, true);
+		planDescriber(plan).writeTo(output, summary, true);
 		final String result = output.toString();
 		assertThat("artifacts from summary, not from walk", result, containsString("Artifacts:    11"));
 		assertThat("pages", result, containsString("Pages:        5"));
@@ -165,7 +165,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
+		planDescriber(plan).describeTo(output, false);
 		final String result = output.toString();
 		assertThat("total artifact count", result, containsString("Artifacts:    4"));
 		assertThat("page count", result, containsString("Pages:        1"));
@@ -188,7 +188,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
+		planDescriber(plan).describeTo(output, false);
 		final String result = output.toString();
 		assertThat("total artifact count (root + sub + page)", result, containsString("Artifacts:    3"));
 		assertThat("collection count (root + sub)", result, containsString("Collections:  2"));
@@ -209,7 +209,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
+		planDescriber(plan).describeTo(output, false);
 		final String result = output.toString();
 		assertThat("post count includes only post-filename artifacts", result, containsString("Posts:        1"));
 		assertThat("page count includes both post and non-post pages", result, containsString("Pages:        2"));
@@ -225,7 +225,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
+		planDescriber(plan).describeTo(output, false);
 		assertThat("source path is the site source directory", output.toString(), containsString("Source:       " + SOURCE_DIRECTORY));
 	}
 
@@ -244,7 +244,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
+		planDescriber(plan).describeTo(output, false);
 		final String result = output.toString();
 		assertThat("redirect count", result, containsString("Redirects:    1"));
 	}
@@ -264,7 +264,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
+		planDescriber(plan).describeTo(output, false);
 		final String result = output.toString();
 		assertThat("redirect count", result, containsString("Redirects:    1"));
 	}
@@ -284,7 +284,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, true);
+		planDescriber(plan).describeTo(output, true);
 		final String result = output.toString();
 		assertThat("verbose output includes redirect details header", result, containsString("Redirect Details:"));
 		assertThat("verbose output includes redirect mapping with -> arrow", result, containsString("    old-page.html -> new-page.html" + NL));
@@ -311,7 +311,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, true);
+		planDescriber(plan).describeTo(output, true);
 		final String result = output.toString();
 		assertThat("2-byte UTF-8 encoded (Latin accented)", result, containsString("    caf%C3%A9.html -> new-caf%C3%A9.html" + NL));
 		assertThat("3-byte UTF-8 encoded (CJK)", result, containsString("    %E6%97%A5%E8%A8%98.html -> %E6%96%B0%E6%97%A5%E8%A8%98.html" + NL));
@@ -326,7 +326,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, true);
+		planDescriber(plan).describeTo(output, true);
 		assertThat("no redirect details when none exist", output.toString(), not(containsString("Redirect Details:")));
 	}
 
@@ -343,7 +343,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
+		planDescriber(plan).describeTo(output, false);
 		assertThat("non-verbose output omits redirect details", output.toString(), not(containsString("Redirect Details:")));
 	}
 
@@ -362,7 +362,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, true);
+		planDescriber(plan).describeTo(output, true);
 		final String result = output.toString();
 		assertThat("warning count shown in summary", result, containsString("Warnings:             1 [!]"));
 		assertThat("redirect detail shows out-of-site path with warning marker", result, containsString("    ../../outside.html -> page.html [!]" + NL));
@@ -382,7 +382,7 @@ public class PlanDescriberTest {
 		final MummyPlan plan = new DefaultMummyPlan(root);
 
 		final StringBuilder output = new StringBuilder();
-		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, true);
+		planDescriber(plan).describeTo(output, true);
 		final String result = output.toString();
 		assertThat("no warning count line for in-site redirects", result, not(containsString("Warnings:")));
 		assertThat("no [!] marker for in-site redirects", result, not(containsString("[!]")));

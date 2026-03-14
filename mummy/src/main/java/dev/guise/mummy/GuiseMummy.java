@@ -21,7 +21,6 @@ import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
 import static java.nio.file.LinkOption.*;
-import static com.globalmentor.net.URIs.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -44,6 +43,7 @@ import io.confound.config.*;
 import io.confound.config.file.*;
 import dev.guise.mummy.deploy.*;
 import dev.guise.mummy.deploy.aws.*;
+import dev.guise.mummy.deploy.flange.FlangeWebSite;
 import dev.guise.mummy.mummify.*;
 import dev.guise.mummy.plan.PlanDescriber;
 import dev.guise.mummy.mummify.collection.DirectoryMummifier;
@@ -330,8 +330,7 @@ public class GuiseMummy implements Clogged {
 			context.setPlan(plan);
 
 			if(executions.contains(MummyExecution.DESCRIBE_PLAN)) {
-				new PlanDescriber(plan, toCollectionURI(rootArtifact.getTargetPath().toUri()))
-						.describeTo(System.out, context.getSiteSourceDirectory(), isVerbose());
+				new PlanDescriber(plan).describeTo(System.out, isVerbose());
 			}
 
 			printArtifactDescription(context, rootArtifact);
@@ -368,6 +367,8 @@ public class GuiseMummy implements Clogged {
 							target = new S3(context, targetSection);
 						} else if(targetType.equals(S3Website.class.getSimpleName())) {
 							target = new S3Website(context, targetSection);
+						} else if(targetType.equals(FlangeWebSite.class.getSimpleName())) {
+							target = new FlangeWebSite(context, targetSection);
 						} else {
 							throw new ConfigurationException("Unknown deployment target type: `%s`.".formatted(targetType));
 						}

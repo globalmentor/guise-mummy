@@ -161,7 +161,7 @@ public class S3 implements DeployTarget, Clogged {
 		return emptySet();
 	}
 
-	private final String profile;
+	private final String profile; //TODO adopt `dev.flange.aws.def.AwsProfile`
 
 	/// Returns the AWS profile if one was set explicitly.
 	/// @return The AWS profile if one was set explicitly.
@@ -358,8 +358,9 @@ public class S3 implements DeployTarget, Clogged {
 	/// @implSpec For each artifact with content this method calls
 	///           [#planResource(MummyContext, URI, Artifact, URIPath, Path, String)].
 	///           For a [DirectoryArtifact], the content is found via its content artifact; for other artifacts, the
-	///           artifact is its own content. Recursion into [CompositeArtifact] children skips subsumed artifacts, which are
-	///           implementation details not independently deployable.
+	///           artifact is its own content. Recursion into [CompositeArtifact] children skips subsumed artifacts:
+	///           a directory's content artifact is already planned above, and other subsumed artifact types are not
+	///           yet supported for deployment (a warning is logged if encountered).
 	/// @param context The context of static site generation.
 	/// @param rootTargetPathUri The URI form of the root artifact target path of the site being deployed.
 	/// @param artifact The current artifact for which deployment is being planned.
@@ -375,7 +376,6 @@ public class S3 implements DeployTarget, Clogged {
 			if(artifact instanceof DirectoryArtifact directoryArtifact) {
 				foundContentArtifact = directoryArtifact.findContentArtifact();
 			} else { // non-directory collection — no content artifact discovery available
-				getLogger().atWarn().log("Collection artifact `{}` is not a `DirectoryArtifact`; skipping content deployment.", artifact);
 				foundContentArtifact = Optional.empty();
 			}
 		} else {
@@ -388,7 +388,12 @@ public class S3 implements DeployTarget, Clogged {
 		if(artifact instanceof CompositeArtifact compositeArtifact) { // recurse into non-subsumed comprised artifacts
 			final Set<Artifact> subsumedArtifacts = toSet(compositeArtifact.getSubsumedArtifacts());
 			for(final Artifact comprisedArtifact : (Iterable<Artifact>)compositeArtifact.comprisedArtifacts()::iterator) {
-				if(!subsumedArtifacts.contains(comprisedArtifact)) { // a directory's content artifact is typically considered subsumed, is thus naturally skipped
+				if(subsumedArtifacts.contains(comprisedArtifact)) { // directory content artifacts are already planned above
+					if(!foundContentArtifact.filter(comprisedArtifact::equals).isPresent()) {
+						getLogger().atWarn().log("Skipping deployment of subsumed artifact `{}`; only directory content artifacts are supported.",
+								comprisedArtifact.getTargetPath());
+					}
+				} else {
 					plan(context, rootTargetPathUri, comprisedArtifact);
 				}
 			}

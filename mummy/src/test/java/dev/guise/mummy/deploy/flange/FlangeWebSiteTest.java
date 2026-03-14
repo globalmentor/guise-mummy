@@ -18,7 +18,6 @@ package dev.guise.mummy.deploy.flange;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.java.OperatingSystem.*;
-import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.security.MessageDigests.*;
 import static dev.guise.mummy.Artifact.*;
 import static org.hamcrest.MatcherAssert.*;
@@ -52,7 +51,6 @@ class FlangeWebSiteTest {
 	private static final Path PROJECT_DIRECTORY = getTempDirectory().resolve("project");
 	private static final Path SOURCE_DIRECTORY = PROJECT_DIRECTORY.resolve("src").resolve("site");
 	private static final Path TARGET_DIRECTORY = PROJECT_DIRECTORY.resolve("target").resolve("site");
-	private static final URI ROOT_TARGET_PATH_URI = toCollectionURI(TARGET_DIRECTORY.toUri());
 
 	//## `Manifest.Builder`
 
@@ -62,7 +60,7 @@ class FlangeWebSiteTest {
 		final var builder = new Manifest.Builder();
 		final Mummifier mummifier = mock(Mummifier.class);
 		final Artifact page = new DummyArtifact(mummifier, SOURCE_DIRECTORY.resolve("page.html"), TARGET_DIRECTORY.resolve("page.html"));
-		builder.addArtifact(TARGET_DIRECTORY.resolve("page.html"), page);
+		builder.addArtifact(page);
 		final var okRedirect = new RedirectEntry(URIPath.of("old.html"), URI.create("page.html"), Optional.empty());
 		final var warnedRedirect = new RedirectEntry(URIPath.of("external.html"), URI.create("https://example.com/"),
 				Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE));
@@ -71,7 +69,7 @@ class FlangeWebSiteTest {
 		assertThat("non-warning redirect extracted", manifest.redirects(), hasEntry(URIPath.of("old.html"), URI.create("page.html")));
 		assertThat("warning redirect filtered out", manifest.redirects(), not(hasKey(URIPath.of("external.html"))));
 		assertThat("redirect count excludes warned entries", manifest.redirects(), aMapWithSize(1));
-		assertThat("artifact indexed by content path", manifest.artifactsByContentPath().get(TARGET_DIRECTORY.resolve("page.html")), is(page));
+		assertThat("artifact indexed by target path", manifest.artifactsByTargetPath().get(TARGET_DIRECTORY.resolve("page.html")), is(page));
 	}
 
 	/// Tests that [Manifest.Builder#build] produces an empty redirect map when all entries carry warnings.
@@ -86,38 +84,26 @@ class FlangeWebSiteTest {
 
 	//## manifest construction via `PlanDescriber.summarize(Visitor)`
 
-	/// Tests that piggybacking a manifest visitor on [PlanDescriber#summarize] correctly indexes file artifacts
-	/// by their target path, and that subsumed content artifacts are skipped by a visitor that checks the flag.
+	/// Tests that piggybacking a manifest visitor on [PlanDescriber#summarize] indexes all artifacts
+	/// by their target path, including both file artifacts and collection artifacts.
 	@Test
-	void testManifestVisitorIndexesFileArtifacts() {
+	void testManifestVisitorIndexesAllArtifacts() {
 		final Mummifier directoryMummifier = mock(Mummifier.class);
 		final PageMummifier pageMummifier = mock(PageMummifier.class);
 		final Artifact page = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("about.html"), TARGET_DIRECTORY.resolve("about.html"));
 		final DirectoryArtifact root = new DirectoryArtifact(directoryMummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, null, Set.of(page));
 		final MummyPlan plan = new DefaultMummyPlan(root);
 		final var manifestBuilder = new Manifest.Builder();
-		final ArtifactTreeWalker.Visitor manifestVisitor = (artifact, subsumed) -> {
-			if(subsumed) {
-				return;
-			}
-			if(artifact instanceof CollectionArtifact) {
-				if(artifact instanceof DirectoryArtifact directoryArtifact) {
-					directoryArtifact.findContentArtifact().ifPresent(contentArtifact -> manifestBuilder.addArtifact(contentArtifact.getTargetPath(), directoryArtifact));
-				}
-			} else {
-				manifestBuilder.addArtifact(artifact.getTargetPath(), artifact);
-			}
-		};
-		final PlanSummary summary = new PlanDescriber(plan, ROOT_TARGET_PATH_URI).summarize(manifestVisitor);
+		final PlanSummary summary = new PlanDescriber(plan).summarize((artifact, _) -> manifestBuilder.addArtifact(artifact));
 		final Manifest manifest = manifestBuilder.build(summary);
-		assertThat("file artifact indexed by target path", manifest.artifactsByContentPath().get(TARGET_DIRECTORY.resolve("about.html")), is(page));
-		assertThat("root directory has no content artifact, so not indexed", manifest.artifactsByContentPath(), not(hasKey(TARGET_DIRECTORY)));
+		assertThat("file artifact indexed", manifest.artifactsByTargetPath().get(TARGET_DIRECTORY.resolve("about.html")), is(page));
+		assertThat("root directory indexed", manifest.artifactsByTargetPath().get(TARGET_DIRECTORY), is(root));
 	}
 
-	/// Tests that a [DirectoryArtifact] with a content artifact maps the **content artifact's** target path
-	/// to the **directory artifact** in the index — because the directory provides the metadata via description delegation.
+	/// Tests that the manifest visitor indexes subsumed content artifacts by their own target path,
+	/// alongside the directory artifact indexed by the directory's target path.
 	@Test
-	void testManifestVisitorIndexesDirectoryByContentPath() {
+	void testManifestVisitorIndexesSubsumedContentArtifact() {
 		final Mummifier directoryMummifier = mock(Mummifier.class);
 		final PageMummifier pageMummifier = mock(PageMummifier.class);
 		final Artifact contentArtifact = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("sub").resolve("index.html"),
@@ -127,26 +113,15 @@ class FlangeWebSiteTest {
 		final DirectoryArtifact root = new DirectoryArtifact(directoryMummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, null, Set.of(subDir));
 		final MummyPlan plan = new DefaultMummyPlan(root);
 		final var manifestBuilder = new Manifest.Builder();
-		final ArtifactTreeWalker.Visitor manifestVisitor = (artifact, subsumed) -> {
-			if(subsumed) {
-				return;
-			}
-			if(artifact instanceof CollectionArtifact) {
-				if(artifact instanceof DirectoryArtifact directoryArtifact) {
-					directoryArtifact.findContentArtifact().ifPresent(content -> manifestBuilder.addArtifact(content.getTargetPath(), directoryArtifact));
-				}
-			} else {
-				manifestBuilder.addArtifact(artifact.getTargetPath(), artifact);
-			}
-		};
-		final PlanSummary summary = new PlanDescriber(plan, ROOT_TARGET_PATH_URI).summarize(manifestVisitor);
-		final Manifest manifest = manifestBuilder.build(summary);
-		final Path contentPath = TARGET_DIRECTORY.resolve("sub").resolve("index.html");
-		assertThat("content path maps to directory artifact, not content artifact", manifest.artifactsByContentPath().get(contentPath), is(subDir));
+		new PlanDescriber(plan).summarize((artifact, _) -> manifestBuilder.addArtifact(artifact));
+		final Manifest manifest = manifestBuilder.build(new PlanSummary(0, 2, 0, 0, 0, List.of()));
+		assertThat("content artifact indexed by its own target path", manifest.artifactsByTargetPath().get(TARGET_DIRECTORY.resolve("sub").resolve("index.html")),
+				is(contentArtifact));
+		assertThat("directory indexed by its target path", manifest.artifactsByTargetPath().get(TARGET_DIRECTORY.resolve("sub")), is(subDir));
 	}
 
 	/// Tests that a directory artifact with both a content artifact and an `altLocation` produces
-	/// **both** a redirect entry and an artifact index entry.
+	/// **both** a redirect entry and artifact index entries for the directory and its content artifact.
 	@Test
 	void testManifestDirectoryWithContentAndRedirect() {
 		final Mummifier directoryMummifier = mock(Mummifier.class);
@@ -160,23 +135,12 @@ class FlangeWebSiteTest {
 		final DirectoryArtifact root = new DirectoryArtifact(directoryMummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, null, Set.of(subDir));
 		final MummyPlan plan = new DefaultMummyPlan(root);
 		final var manifestBuilder = new Manifest.Builder();
-		final ArtifactTreeWalker.Visitor manifestVisitor = (artifact, subsumed) -> {
-			if(subsumed) {
-				return;
-			}
-			if(artifact instanceof CollectionArtifact) {
-				if(artifact instanceof DirectoryArtifact directoryArtifact) {
-					directoryArtifact.findContentArtifact().ifPresent(content -> manifestBuilder.addArtifact(content.getTargetPath(), directoryArtifact));
-				}
-			} else {
-				manifestBuilder.addArtifact(artifact.getTargetPath(), artifact);
-			}
-		};
-		final PlanSummary summary = new PlanDescriber(plan, ROOT_TARGET_PATH_URI).summarize(manifestVisitor);
+		final PlanSummary summary = new PlanDescriber(plan).summarize((artifact, _) -> manifestBuilder.addArtifact(artifact));
 		final Manifest manifest = manifestBuilder.build(summary);
 		assertThat("redirect extracted for collection", manifest.redirects(), hasKey(URIPath.of("sub/old-sub/")));
 		assertThat("redirect target is the collection reference", manifest.redirects().get(URIPath.of("sub/old-sub/")), is(URI.create("sub/")));
-		assertThat("content indexed by content artifact's path", manifest.artifactsByContentPath(), hasKey(TARGET_DIRECTORY.resolve("sub").resolve("index.html")));
+		assertThat("content artifact indexed by its target path", manifest.artifactsByTargetPath(), hasKey(TARGET_DIRECTORY.resolve("sub").resolve("index.html")));
+		assertThat("directory indexed by its target path", manifest.artifactsByTargetPath(), hasKey(TARGET_DIRECTORY.resolve("sub")));
 	}
 
 	//## `ArtifactMetadataStrategy`
@@ -226,11 +190,39 @@ class FlangeWebSiteTest {
 		final UrfObject description = new UrfObject();
 		description.setPropertyValue(Content.TYPE_PROPERTY_TAG, MediaType.of(MediaType.TEXT_PRIMARY_TYPE, "html"));
 		final Artifact page = new DummyArtifact(mummifier, SOURCE_DIRECTORY.resolve("page.html"), TARGET_DIRECTORY.resolve("page.html"), description);
+		final DirectoryArtifact root = new DirectoryArtifact(mummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, null, Set.of(page));
+		final MummyPlan plan = new DefaultMummyPlan(root);
 		final Path knownPath = TARGET_DIRECTORY.resolve("page.html");
 		final Path unknownPath = TARGET_DIRECTORY.resolve("missing.html");
-		final var strategy = new ArtifactMetadataStrategy(Map.of(knownPath, page));
+		final var strategy = new ArtifactMetadataStrategy(plan, Map.of(knownPath, page));
 		assertThat("known path returns metadata", strategy.findMetadata(knownPath, new LinkedHashSet<>(List.of(SHA_256))).isPresent(), is(true));
 		assertThat("unknown path returns empty", strategy.findMetadata(unknownPath, new LinkedHashSet<>(List.of(SHA_256))).isPresent(), is(false));
+	}
+
+	/// Tests that [ArtifactMetadataStrategy#findMetadata] resolves a directory content artifact's path
+	/// to the directory artifact's metadata via [MummyPlan#getPrincipalArtifact].
+	@Test
+	void testFindMetadataResolvesContentArtifactToDirectoryMetadata() {
+		final Mummifier directoryMummifier = mock(Mummifier.class);
+		final PageMummifier pageMummifier = mock(PageMummifier.class);
+		final UrfObject contentDescription = new UrfObject();
+		contentDescription.setPropertyValue(Content.TYPE_PROPERTY_TAG, MediaType.of(MediaType.TEXT_PRIMARY_TYPE, "html"));
+		final Artifact contentArtifact = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("sub").resolve("index.html"),
+				TARGET_DIRECTORY.resolve("sub").resolve("index.html"), contentDescription);
+		final DirectoryArtifact subDir = new DirectoryArtifact(directoryMummifier, SOURCE_DIRECTORY.resolve("sub"), TARGET_DIRECTORY.resolve("sub"),
+				contentArtifact, Set.of());
+		final DirectoryArtifact root = new DirectoryArtifact(directoryMummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, null, Set.of(subDir));
+		final MummyPlan plan = new DefaultMummyPlan(root);
+		final var manifestBuilder = new Manifest.Builder();
+		new PlanDescriber(plan).summarize((artifact, _) -> manifestBuilder.addArtifact(artifact));
+		final Manifest manifest = manifestBuilder.build(new PlanSummary(0, 2, 0, 0, 0, List.of()));
+		final var strategy = new ArtifactMetadataStrategy(plan, manifest.artifactsByTargetPath());
+		final Path contentPath = TARGET_DIRECTORY.resolve("sub").resolve("index.html");
+		assertThat("metadata returned for directory content artifact", strategy.findMetadata(contentPath, new LinkedHashSet<>(List.of(SHA_256))).isPresent(),
+				is(true));
+		assertThat("content type resolved through principal artifact",
+				strategy.findMetadata(contentPath, new LinkedHashSet<>(List.of(SHA_256))).orElseThrow().contentType(),
+				isPresentAndIs(MediaType.of(MediaType.TEXT_PRIMARY_TYPE, "html")));
 	}
 
 }

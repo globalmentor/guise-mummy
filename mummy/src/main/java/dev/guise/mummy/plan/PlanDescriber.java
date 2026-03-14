@@ -22,7 +22,6 @@ import static java.util.Objects.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.*;
 
 import org.jspecify.annotations.*;
@@ -51,11 +50,12 @@ public class PlanDescriber {
 
 	/// Constructor.
 	/// @param plan The mummy plan to summarize and describe.
-	/// @param rootTargetPathUri The URI form of the root artifact target path, used for relativizing artifact paths into
-	///        site-relative resource references.
-	public PlanDescriber(@NonNull final MummyPlan plan, @NonNull final URI rootTargetPathUri) {
+	public PlanDescriber(@NonNull final MummyPlan plan) {
 		this.plan = requireNonNull(plan);
-		this.rootTargetPathUri = requireNonNull(rootTargetPathUri);
+		// Deploy targets can rely on `Path.toUri()` producing a trailing slash because the target directory
+		// exists on disk at deploy time. `PlanDescriber` may run during the plan phase before the target
+		// directory is created, so `toCollectionURI()` is needed to ensure proper relativization.
+		this.rootTargetPathUri = toCollectionURI(plan.getRootArtifact().getTargetPath().toUri());
 	}
 
 	/// Walks the plan's artifact tree and produces a [PlanSummary] with artifact counts and redirect entries.
@@ -99,18 +99,15 @@ public class PlanDescriber {
 
 	/// Writes the formatted plan description to the given appendable.
 	/// @param appendable The target for the description output.
-	/// @param siteSourceDirectory The site source directory, displayed in the summary header.
 	/// @param summary The plan summary containing counts and redirect data.
 	/// @param verbose Whether to include per-item detail listings such as individual redirect mappings.
 	/// @throws IOException if an I/O error occurs while writing.
-	public void writeTo(@NonNull final Appendable appendable, @NonNull final Path siteSourceDirectory, @NonNull final PlanSummary summary, final boolean verbose)
-			throws IOException {
+	public void writeTo(@NonNull final Appendable appendable, @NonNull final PlanSummary summary, final boolean verbose) throws IOException {
 		requireNonNull(appendable);
-		requireNonNull(siteSourceDirectory);
 		requireNonNull(summary);
 		final List<RedirectEntry> sortedRedirects = summary.sortedRedirects();
 		appendable.append("Site Plan%n".formatted());
-		appendable.append("  %-14s%s%n".formatted("Source:", siteSourceDirectory));
+		appendable.append("  %-14s%s%n".formatted("Source:", plan.getRootArtifact().getSourcePath()));
 		appendable.append("  %-14s%d%n".formatted("Artifacts:", summary.totalCount()));
 		appendable.append("    %-14s%d%n".formatted("Pages:", summary.pageCount()));
 		appendable.append("    %-14s%d%n".formatted("Collections:", summary.collectionCount()));
@@ -142,11 +139,10 @@ public class PlanDescriber {
 
 	/// Convenience method that summarizes the plan and writes the description in one call.
 	/// @param appendable The target for the description output.
-	/// @param siteSourceDirectory The site source directory, displayed in the summary header.
 	/// @param verbose Whether to include per-item detail listings such as individual redirect mappings.
 	/// @throws IOException if an I/O error occurs while writing.
-	public void describeTo(@NonNull final Appendable appendable, @NonNull final Path siteSourceDirectory, final boolean verbose) throws IOException {
-		writeTo(appendable, siteSourceDirectory, summarize(), verbose);
+	public void describeTo(@NonNull final Appendable appendable, final boolean verbose) throws IOException {
+		writeTo(appendable, summarize(), verbose);
 	}
 
 	/// Examines an artifact for a `mummy/altLocation` property and returns the corresponding redirect entry, if any.
