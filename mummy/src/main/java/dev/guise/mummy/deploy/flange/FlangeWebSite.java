@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.guise.mummy.deploy.aws;
+package dev.guise.mummy.deploy.flange;
 
 import static com.globalmentor.util.Optionals.*;
 import static java.util.Objects.*;

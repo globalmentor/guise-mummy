@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.guise.mummy.deploy.aws;
+package dev.guise.mummy.deploy.flange;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.java.OperatingSystem.*;
@@ -37,7 +37,7 @@ import com.globalmentor.security.Hash;
 
 import dev.flange.aws.s3.support.S3Synchronizer;
 import dev.guise.mummy.*;
-import dev.guise.mummy.deploy.aws.FlangeWebSite.*;
+import dev.guise.mummy.deploy.flange.FlangeWebSite.*;
 import dev.guise.mummy.mummify.Mummifier;
 import dev.guise.mummy.mummify.collection.DirectoryArtifact;
 import dev.guise.mummy.mummify.page.PageMummifier;
