@@ -36,8 +36,8 @@ import com.globalmentor.io.Filenames;
 import com.globalmentor.xml.DefaultEntityResolver;
 
 import io.confound.config.ConfigurationException;
+import dev.guise.mummy.mummify.GenericFileMummifier;
 import dev.guise.mummy.mummify.Mummifier;
-import dev.guise.mummy.mummify.OpaqueFileMummifier;
 import dev.guise.mummy.mummify.SourcePathMummifier;
 import dev.guise.mummy.mummify.collection.DirectoryMummifier;
 import dev.guise.mummy.mummify.image.DefaultImageMummifier;
@@ -46,14 +46,14 @@ import dev.guise.mummy.mummify.page.MarkdownPageMummifier;
 import dev.guise.mummy.mummify.page.XhtmlPageMummifier;
 
 /// Abstract base implementation of a mummification context with common default functionality.
-/// @implSpec This implementation uses an [OpaqueFileMummifier] as the default file mummifier and a [DirectoryMummifier] as the default directory
+/// @implSpec This implementation uses a [GenericFileMummifier] as the default file mummifier and a [DirectoryMummifier] as the default directory
 ///           mummifier.
 /// @implSpec This implementation registers common mummifiers by default; they can be overridden using [#registerFileMummifier(SourcePathMummifier)].
 /// @author Garret Wilson
 public abstract class BaseMummyContext extends AbstractMummyContext {
 
 	/// The default mummifier for normal files.
-	private final SourcePathMummifier defaultFileMummifier = new OpaqueFileMummifier();
+	private final SourcePathMummifier defaultFileMummifier = new GenericFileMummifier();
 
 	/// The default mummifier for normal directories.
 	private final SourcePathMummifier defaultDirectoryMummifier = new DirectoryMummifier();

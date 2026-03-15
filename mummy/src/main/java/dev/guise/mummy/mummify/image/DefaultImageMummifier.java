@@ -141,7 +141,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 				}
 			}
 		} else {
-			copy(artifact.getSourcePath(), artifact.getTargetPath(), REPLACE_EXISTING); //TODO abstract the copy, here and in OpaqueFileMummifier
+			copy(artifact.getSourcePath(), artifact.getTargetPath(), REPLACE_EXISTING); //TODO abstract the copy, here and in OpaqueFileMummifier/GenericFileMummifier
 		}
 
 		if(artifact instanceof AspectualArtifact aspectualArtifact) { //mummify any image aspects TODO generalize within framework

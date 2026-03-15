@@ -80,7 +80,7 @@ Read more [about](about.md) this site.
 
 * **Dotfiles** — Any file or directory starting with `.` is excluded from the generated site but may influence generation. For example `.template.xhtml` serves as a template (see [Templates](#templates)) but does not itself appear in the output.
 * **Veiled files** — A file or directory starting with `_` (underscore) _is_ included in the generated site but hidden from generated navigation menus. For example an `_assets/` directory containing `_assets/css/` and `_assets/js/` will still appear in the target site, but no "assets" menu item will be generated.
-* **Assets** — A file or directory starting with `$` (dollar sign) is copied to the target site but excluded from both navigation and page processing. Use assets for raw files that should not be treated as content.
+* **Assets** — A file or directory starting with `$` (dollar sign) is included in the target site but excluded from both navigation and page processing. The asset designation suppresses page generation only — files that would otherwise be processed by a page mummifier (Markdown, XHTML, HTML) are instead handled by the default file mummifier. Other registered mummifiers (such as the image mummifier) still apply normally; for example, a large image in an asset directory may still be scaled.
 
 ### Templates
 
@@ -191,7 +191,7 @@ For page artifacts (XHTML, Markdown), `AbstractPageMummifier` orchestrates the f
 8. **Ascribe** — Artifact metadata is written back into the HTML as `<meta>` elements (title, author, generator, generation timestamp).
 9. **Save** — The final XHTML DOM is serialized as an HTML5 document.
 
-Not all mummifiers follow this pipeline. An `OpaqueFileMummifier` simply copies unrecognized file types (CSS, JavaScript, fonts, etc.) to the target unchanged. Image mummifiers may perform optimization without DOM processing.
+Not all mummifiers follow this pipeline. A `GenericFileMummifier` (the default fallback) copies unrecognized file types (CSS, JavaScript, fonts, etc.) to the target unchanged, determining media type from the filename extension. `OpaqueFileMummifier` does the same without media type detection. Image mummifiers may perform optimization without DOM processing.
 
 ### Design Highlights
 
