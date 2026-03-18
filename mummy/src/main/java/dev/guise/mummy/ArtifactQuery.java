@@ -18,7 +18,7 @@ package dev.guise.mummy;
 
 import org.jspecify.annotations.*;
 
-import com.globalmentor.net.URIPath;
+import com.globalmentor.net.UriPath;
 
 /// A means for querying artifacts.
 ///
@@ -40,17 +40,17 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	/// @param sourceRelativeReference The relative URI path being used as a reference to some artifact.
 	/// @throws IllegalArgumentException if the given reference path is absolute.
 	/// @return This artifact query.
-	public ArtifactQuery fromChildrenOf(@NonNull Artifact artifact, @NonNull final URIPath sourceRelativeReference);
+	public ArtifactQuery fromChildrenOf(@NonNull Artifact artifact, @NonNull final UriPath sourceRelativeReference);
 
 	/// Initially queries children of an artifact referred to by a URI path source reference relative to some other artifact.
-	/// @apiNote This is a convenience method for [#fromChildrenOf(Artifact, URIPath)] for MEXL query construction.
-	/// @implSpec The default implementation delegates to [#fromChildrenOf(Artifact, URIPath)].
+	/// @apiNote This is a convenience method for [#fromChildrenOf(Artifact, UriPath)] for MEXL query construction.
+	/// @implSpec The default implementation delegates to [#fromChildrenOf(Artifact, UriPath)].
 	/// @param artifact The artifact the relative reference should be resolved against when finding the referent artifact.
 	/// @param sourceRelativeReference The relative URI path being used as a reference to some artifact.
 	/// @throws IllegalArgumentException if the given string is not a valid reference path or is absolute.
 	/// @return This artifact query.
 	public default ArtifactQuery fromChildrenOf(@NonNull Artifact artifact, @NonNull final String sourceRelativeReference) {
-		return fromChildrenOf(artifact, URIPath.of(sourceRelativeReference));
+		return fromChildrenOf(artifact, UriPath.parse(sourceRelativeReference));
 	}
 
 	/// Initially queries siblings of a given artifact. An artifact will not have siblings if it has no parent. If any artifacts are included, the returned
@@ -66,19 +66,19 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	/// @param sourceRelativeReference The relative URI path being used as a reference to some artifact.
 	/// @throws IllegalArgumentException if the given reference path is absolute.
 	/// @return This artifact query.
-	public ArtifactQuery fromSiblingsOf(@NonNull Artifact artifact, @NonNull final URIPath sourceRelativeReference);
+	public ArtifactQuery fromSiblingsOf(@NonNull Artifact artifact, @NonNull final UriPath sourceRelativeReference);
 
 	/// Initially queries siblings of an artifact referred to by a URI path source reference relative to some other artifact. An artifact will not have siblings if
 	/// it has no parent. If any artifacts are included, the returned artifacts *will* include the given artifact. This means that a single child artifact
 	/// would include only itself as the single sibling artifact.
-	/// @apiNote This is a convenience method for [#fromSiblingsOf(Artifact, URIPath)] for MEXL query construction.
-	/// @implSpec The default implementation delegates to [#fromSiblingsOf(Artifact, URIPath)].
+	/// @apiNote This is a convenience method for [#fromSiblingsOf(Artifact, UriPath)] for MEXL query construction.
+	/// @implSpec The default implementation delegates to [#fromSiblingsOf(Artifact, UriPath)].
 	/// @param artifact The artifact the relative reference should be resolved against when finding the referent artifact.
 	/// @param sourceRelativeReference The relative URI path being used as a reference to some artifact.
 	/// @throws IllegalArgumentException if the given string is not a valid reference path or is absolute.
 	/// @return This artifact query.
 	public default ArtifactQuery fromSiblingsOf(@NonNull Artifact artifact, @NonNull final String sourceRelativeReference) {
-		return fromSiblingsOf(artifact, URIPath.of(sourceRelativeReference));
+		return fromSiblingsOf(artifact, UriPath.parse(sourceRelativeReference));
 	}
 
 	/// Initially queries artifacts at the same level of the given artifact. The given artifact itself may be included, depending on whether the artifact is a
@@ -99,21 +99,21 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	/// @param sourceRelativeReference The relative URI path being used as a reference to some artifact.
 	/// @throws IllegalArgumentException if the given reference path is absolute.
 	/// @return This artifact query.
-	public ArtifactQuery fromLevelOf(@NonNull Artifact artifact, @NonNull final URIPath sourceRelativeReference);
+	public ArtifactQuery fromLevelOf(@NonNull Artifact artifact, @NonNull final UriPath sourceRelativeReference);
 
 	/// Initially queries artifacts at the same level of an artifact referred to by a URI path source reference relative to some other artifact. The resolved
 	/// artifact itself may be included, depending on whether the artifact is a stand-in for the main resource (e.g. as the index artifact is for a directory), in
 	/// which case it will not be included. If the resolved artifact itself represents a level such as a directory, it children will be returned.
 	/// @apiNote This method allows querying of artifacts at a certain level without needing to worry whether the given artifact is subsumed, such as
 	///          `index.html`, and standing in for the collection.
-	/// @apiNote This is a convenience method for [#fromLevelOf(Artifact, URIPath)] for MEXL query construction.
-	/// @implSpec The default implementation delegates to [#fromLevelOf(Artifact, URIPath)].
+	/// @apiNote This is a convenience method for [#fromLevelOf(Artifact, UriPath)] for MEXL query construction.
+	/// @implSpec The default implementation delegates to [#fromLevelOf(Artifact, UriPath)].
 	/// @param artifact The artifact the relative reference should be resolved against when finding the referent artifact.
 	/// @param sourceRelativeReference The relative URI path being used as a reference to some artifact.
 	/// @throws IllegalArgumentException if the given string is not a valid reference path or is absolute.
 	/// @return This artifact query.
 	public default ArtifactQuery fromLevelOf(@NonNull Artifact artifact, @NonNull final String sourceRelativeReference) {
-		return fromLevelOf(artifact, URIPath.of(sourceRelativeReference));
+		return fromLevelOf(artifact, UriPath.parse(sourceRelativeReference));
 	}
 
 	//filter

@@ -1,5 +1,9 @@
 # Guise Mummy Path Representation
 
+> **Superseded.** This design document was created during [GUISE-229] development. Its content has been incorporated into and superseded by the [architecture document](../../../mummy/architecture.md), which provides broader coverage including lifecycle-phase considerations not addressed here.
+
+[GUISE-229]: ../
+
 This document describes how Guise Mummy represents, translates, and operates on paths — both filesystem paths and site URI paths. It establishes the terminology (the ubiquitous language) used throughout the codebase and explains the conceptual model that keeps path handling consistent.
 
 ## Two Coordinate Systems

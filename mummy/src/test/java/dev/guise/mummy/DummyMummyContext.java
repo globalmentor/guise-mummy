@@ -18,6 +18,7 @@ package dev.guise.mummy;
 
 import static java.util.Objects.*;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -51,6 +52,26 @@ public class DummyMummyContext implements MummyContext {
 	/// @param project The Guise project.
 	public DummyMummyContext(@NonNull final GuiseProject project) {
 		this.project = requireNonNull(project);
+	}
+
+	@Override
+	public URI getRoot() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Path getSiteSourceDirectory() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Path getSiteTargetDirectory() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Path getSiteDescriptionTargetDirectory() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

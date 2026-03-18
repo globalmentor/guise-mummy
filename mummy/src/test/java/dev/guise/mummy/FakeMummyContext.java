@@ -16,6 +16,8 @@
 
 package dev.guise.mummy;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 import org.jspecify.annotations.*;
@@ -31,8 +33,14 @@ public class FakeMummyContext extends BaseMummyContext {
 
 	/// Constructor.
 	/// @param project The Guise project.
-	public FakeMummyContext(@NonNull final GuiseProject project) {
-		super(project);
+	/// @param siteSourceDirectory The base directory of the site source, in real-path form.
+	/// @param siteTargetDirectory The output directory of the site, in real-path form.
+	/// @param siteDescriptionTargetDirectory The output directory of the site description, in real-path form.
+	/// @throws IllegalArgumentException if any directory path is not in real-path form.
+	/// @throws IOException if an I/O error occurs during real-path validation.
+	public FakeMummyContext(@NonNull final GuiseProject project, @NonNull final Path siteSourceDirectory, @NonNull final Path siteTargetDirectory,
+			@NonNull final Path siteDescriptionTargetDirectory) throws IOException {
+		super(project, siteSourceDirectory, siteTargetDirectory, siteDescriptionTargetDirectory);
 	}
 
 	@Override

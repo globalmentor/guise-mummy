@@ -29,7 +29,15 @@ public interface CompositeArtifact extends Artifact {
 	public Stream<Artifact> comprisedArtifacts();
 
 	/// Returns any comprised artifacts that have been subsumed into this one and should not be visible as separate references.
-	/// @apiNote the subsumed artifacts returned here will be a subset of those returned from [#comprisedArtifacts()].
+	///
+	/// Subsumption is a relationship between this composite and its immediate comprised artifacts — it categorizes
+	/// certain children as implementation details of the parent rather than independently addressable entities. It is
+	/// not a transitive state: if a subsumed artifact is itself a composite, its own children are governed by their own
+	/// parent's declarations, not by subsumption further up the tree. (An ancestor's subsumption may render descendants
+	/// unreachable in practice, but unreachability is a consequence of tree structure, not a propagation of the
+	/// subsumption designation.)
+	///
+	/// @apiNote The subsumed artifacts returned here will be a subset of those returned from [#comprisedArtifacts()].
 	/// @return The subsumed artifacts, if any, of this artifact.
 	public Collection<Artifact> getSubsumedArtifacts();
 

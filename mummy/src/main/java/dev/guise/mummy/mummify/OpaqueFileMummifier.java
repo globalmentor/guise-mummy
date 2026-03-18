@@ -17,6 +17,7 @@
 package dev.guise.mummy.mummify;
 
 import static com.globalmentor.io.Files.*;
+import static java.nio.file.Files.*;
 import static java.nio.file.StandardCopyOption.*;
 import static java.util.Collections.*;
 
@@ -64,7 +65,7 @@ public class OpaqueFileMummifier extends AbstractFileMummifier {
 	public void mummifyFile(final MummyContext context, final CorporealSourceArtifact artifact) throws IOException {
 		final Path sourceFile = artifact.getSourcePath();
 		checkArgumentRegularFile(sourceFile);
-		Files.copy(sourceFile, artifact.getTargetPath(), REPLACE_EXISTING);
+		copy(sourceFile, artifact.getTargetPath(), REPLACE_EXISTING);
 	}
 
 }

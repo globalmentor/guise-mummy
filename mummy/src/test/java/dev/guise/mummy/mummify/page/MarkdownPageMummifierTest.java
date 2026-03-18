@@ -18,9 +18,9 @@ package dev.guise.mummy.mummify.page;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.html.HtmlDom.*;
+import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.html.def.HTML.*;
 import static com.globalmentor.io.Filenames.*;
-import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static dev.guise.mummy.mummify.page.MarkdownPageMummifier.*;
 import static java.nio.charset.StandardCharsets.*;
@@ -30,6 +30,7 @@ import static org.hamcrest.Matchers.*;
 
 import java.io.*;
 import java.net.URI;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -54,9 +55,10 @@ public class MarkdownPageMummifierTest {
 	private MummyContext mummyContext;
 
 	@BeforeEach
-	protected void setupContext() {
-		final GuiseProject project = new DefaultGuiseProject(getWorkingDirectory(), Configuration.empty());
-		mummyContext = new FakeMummyContext(project);
+	protected void setupContext() throws IOException {
+		final Path workingDirectory = getWorkingDirectory();
+		final GuiseProject project = new DefaultGuiseProject(workingDirectory, Configuration.empty());
+		mummyContext = new FakeMummyContext(project, workingDirectory, workingDirectory, workingDirectory);
 	}
 
 	/// Retrieves the text content of the first paragraph in the given document.

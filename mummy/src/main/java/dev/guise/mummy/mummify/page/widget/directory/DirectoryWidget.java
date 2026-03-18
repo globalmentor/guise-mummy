@@ -231,6 +231,7 @@ public class DirectoryWidget implements Widget {
 									.flatMap(asInstance(LocalDate.class)).orElse(null), nullsLast(naturalOrder()))
 							.thenComparing(Artifact::determineTitle, titleCollator)).map(item -> { //map each item to `<li><a>title</a></li>`
 								final Element liElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI); //<li>
+
 								final String postHref = context.getPlan().referenceInSource(artifact, item).toString();
 								final Element liElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<li><a>
 								liElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);

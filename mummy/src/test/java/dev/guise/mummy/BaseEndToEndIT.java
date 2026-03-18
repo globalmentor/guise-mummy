@@ -75,13 +75,14 @@ public abstract class BaseEndToEndIT {
 	/// @see #getFixtureProject()
 	@BeforeEach
 	protected void setupFixture(@TempDir final Path tempDir) throws IOException {
+		final Path realTempDir = tempDir.toRealPath();
 		//create a custom configuration falling back to the default configuration
-		final Configuration defaultConfiguration = getDefaultConfiguration(tempDir);
+		final Configuration defaultConfiguration = getDefaultConfiguration(realTempDir);
 		settings = new HashMap<>();
 		configure(settings);
 		final Configuration fixtureConfiguration = new ObjectMapConfiguration(settings).withFallback(defaultConfiguration);
 		//create the fixture project
-		fixtureProject = new DefaultGuiseProject(tempDir, fixtureConfiguration);
+		fixtureProject = new DefaultGuiseProject(realTempDir, fixtureConfiguration);
 		//populate the site source directory
 		final Path siteSourceDirectory = fixtureProject.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY);
 		createDirectories(siteSourceDirectory);

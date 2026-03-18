@@ -64,38 +64,27 @@ public interface MummyContext {
 	/// this root.
 	/// @apiNote This method will typically but not necessarily return the URI form of the site source directory.
 	/// @return The URI that represents the root of the current context.
-	public default URI getRoot() { //TODO move to some abstract base class; if it is configurable, it shouldn't have a default implementation
-		return getSiteSourceDirectory().toUri();
-	}
+	public URI getRoot();
 
 	/// Returns the base directory of the entire site source, representing the root of the context.
-	/// @implSpec The default implementation retrieves the value for key `siteSourceDirectory` from the configuration and
-	///           resolves it against the project directory.
+	///
+	/// The returned path is absolute and in real-path form.
 	/// @apiNote This is analogous to Maven's `${project.basedir}/src/site` directory.
-	/// @return The base directory of the site being mummified.
-	/// @see GuiseProject#getDirectory()
-	public default Path getSiteSourceDirectory() {
-		return getProject().getDirectory().resolve(getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
-	}
+	/// @return The absolute, real-path base directory of the site being mummified.
+	public Path getSiteSourceDirectory();
 
 	/// Returns the output directory of the entire site, representing the root of the context.
-	/// @implSpec The default implementation retrieves the value for key `siteTargetDirectory` from the configuration and
-	///           resolves it against the project directory.
+	///
+	/// The returned path is absolute and in real-path form.
 	/// @apiNote This is analogous to Maven's `${project.build.directory}` directory.
-	/// @return The base output directory of the site being mummified.
-	/// @see GuiseProject#getDirectory()
-	public default Path getSiteTargetDirectory() {
-		return getProject().getDirectory().resolve(getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
-	}
+	/// @return The absolute, real-path base output directory of the site being mummified.
+	public Path getSiteTargetDirectory();
 
 	/// Returns the output directory of the site description.
-	/// @implSpec The default implementation retrieves the value for key `siteDescriptionTargetDirectory` from the
-	///           configuration and resolves it against the project directory.
-	/// @return The base output directory of the generated site description.
-	/// @see GuiseProject#getDirectory()
-	public default Path getSiteDescriptionTargetDirectory() {
-		return getProject().getDirectory().resolve(getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
-	}
+	///
+	/// The returned path is absolute and in real-path form.
+	/// @return The absolute, real-path base output directory of the generated site description.
+	public Path getSiteDescriptionTargetDirectory();
 
 	//TODO public UrfObject getResourceDescription(path)
 

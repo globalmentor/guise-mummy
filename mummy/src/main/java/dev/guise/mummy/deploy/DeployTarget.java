@@ -28,6 +28,23 @@ import org.jspecify.annotations.*;
 import dev.guise.mummy.*;
 
 /// A strategy for deploying a site to some other location such as a server.
+///
+/// # State Model
+///
+/// A deploy target is **stateful across lifecycle phases**. The expected state flow is:
+///
+/// 1. **Constructor** — receives immutable configuration (profile, region, bucket names, etc.) derived from the project
+///    configuration, and constructs any API clients needed for infrastructure interaction. These values are stored as
+///    `final` fields and do not change.
+/// 2. **[#prepare(MummyContext)]** — discovers or provisions infrastructure (buckets, certificates, environments).
+///    Results that are needed in later phases are cached as instance fields. For example, an ACM certificate ARN
+///    resolved during preparation is stored for use during deployment.
+/// 3. **[#deploy(MummyContext, Artifact)]** — consumes cached infrastructure state from preparation and reads
+///    runtime configuration from [MummyContext#getConfiguration()] on demand. Configuration values are **not** cached
+///    from the constructor; `context.getConfiguration()` is called directly where needed.
+///
+/// @apiNote Implementations should document any fields set during [#prepare(MummyContext)] and their availability
+///          guarantees, following the pattern established by `CloudFront.getAcmCertificateArn()`.
 /// @author Garret Wilson
 public interface DeployTarget {
 
@@ -50,7 +67,10 @@ public interface DeployTarget {
 				.flatMap(asInstances(ContentDeliveryTarget.class)).filter(target -> target.getOriginTarget(context) == thisDeployTarget);
 	}
 
-	/// Prepares for deploying a site. This may include configuring a server, for example.
+	/// Prepares for deploying a site. This may include provisioning infrastructure (e.g. creating buckets, requesting
+	/// certificates) or resolving externally managed infrastructure (e.g. looking up a deployment environment).
+	/// @implSpec Implementations may cache discovered infrastructure state as instance fields for use in [#deploy(MummyContext, Artifact)].
+	///          Such fields should document that they are available only after successful preparation.
 	/// @param context The context of static site generation.
 	/// @throws IOException if there is an I/O error during site deployment preparation.
 	public void prepare(@NonNull final MummyContext context) throws IOException;

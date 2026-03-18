@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.*;
 
 import java.io.*;
 import java.net.URI;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -40,9 +41,10 @@ public class XhtmlPageMummifierTest {
 	private MummyContext mummyContext;
 
 	@BeforeEach
-	protected void setupContext() {
-		final GuiseProject project = new DefaultGuiseProject(getWorkingDirectory(), Configuration.empty());
-		mummyContext = new FakeMummyContext(project);
+	protected void setupContext() throws IOException {
+		final Path workingDirectory = getWorkingDirectory();
+		final GuiseProject project = new DefaultGuiseProject(workingDirectory, Configuration.empty());
+		mummyContext = new FakeMummyContext(project, workingDirectory, workingDirectory, workingDirectory);
 	}
 
 	/// @see XhtmlPageMummifier#loadSourceMetadata(MummyContext, InputStream, String)

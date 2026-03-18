@@ -17,7 +17,7 @@
 package dev.guise.mummy;
 
 import static com.globalmentor.io.Filenames.*;
-import static com.globalmentor.net.URIPath.*;
+import static com.globalmentor.net.UriPath.*;
 import static com.globalmentor.net.URIs.*;
 import static dev.guise.mummy.GuiseMummy.*;
 
@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 
-import com.globalmentor.net.URIPath;
+import com.globalmentor.net.UriPath;
 
 import dev.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
@@ -43,7 +43,7 @@ import io.urf.model.UrfResourceDescription;
 /// - **content artifact**: A special *subsumed artifact* of a directory that serves to represent its content. Historically the content artifact was `index.html`. Note that a content artifact is *not* a *child artifact* of its directory.
 /// - **corporeal artifact**: An artifact that potentially contains content, such as a [CorporealSourceArtifact].
 /// - **principal artifact**: An artifact that should be used as the canonical source and target for IRI path references. An artifact is normally its own principal artifact unless it is a *subsumed artifact* in which case the principal artifact is the one it is subsumed into and which should be used for IRI path references.
-/// - **subsumed artifact**: An artifact that has been subsumed into another one one and should not be visible as separate IRI path references. The archetypal subsumed artifact is the *content artifact* (historically `index.html`) of a directory.
+/// - **subsumed artifact**: An artifact that a *composite artifact* has absorbed as an implementation detail, making it not visible as a separate IRI path reference. Subsumption is a direct parent–child designation, not a transitive state — each composite independently declares which of its own comprised artifacts are subsumed. The archetypal subsumed artifact is the *content artifact* (historically `index.html`) of a directory.
 /// - **veiled artifact**: A resource that is available to be served to the user agent if access directly, but is not part of the normal navigation tree. Veiled artifacts are usually designated by some indication in the source filename, such as an underscore prefix.
 ///
 /// @author Garret Wilson
@@ -181,14 +181,16 @@ public interface Artifact {
 
 	/// Returns the path to the directory containing the artifact source file. If the artifact source path refers to a directory, this method returns the source
 	/// path itself; otherwise this method returns the parent directory.
-	/// @return The source directory of the artifact.
+	/// @return The absolute, real-path source directory of the artifact.
 	/// @see #getSourcePath()
 	public Path getSourceDirectory();
 
 	/// Returns the path to the source of the artifact in the source tree.
+	///
+	/// The returned path is absolute and in real-path form, with filesystem-native case for all segments.
 	/// @apiNote Depending on the artifact implementation, the source path is not guaranteed to exist.
 	/// @apiNote This method and all methods in this interface related to a source path in a file system may be moved eventually to [SourcePathArtifact].
-	/// @return The path referring to the source of this artifact, which may be a file or a directory.
+	/// @return The absolute, real-path path referring to the source of this artifact, which may be a file or a directory.
 	public Path getSourcePath();
 
 	/// Indicates whether the source path refers to a file as opposed to a directory. This implies that its source path is distinct from the source directory and
@@ -209,7 +211,9 @@ public interface Artifact {
 	public Set<Path> getReferentSourcePaths();
 
 	/// Returns the path to the generated artifact in the target tree.
-	/// @return The path to the generated artifact in the target tree.
+	///
+	/// The returned path is absolute and in real-path form, with filesystem-native case for all segments.
+	/// @return The absolute, real-path path to the generated artifact in the target tree.
 	public Path getTargetPath();
 
 	/// Returns the mummifier responsible for mummifying this artifact.
@@ -234,7 +238,7 @@ public interface Artifact {
 	/// @param referenceUri The URI to relativize.
 	/// @param forceCollection Whether to force the reference into collection form before relativizing.
 	/// @return The relativized resource reference as a URI path.
-	public static URIPath relativizeResourceReference(final URI baseUri, final URI referenceUri, final boolean forceCollection) { //TODO extract to `URIPath` or `URIs` in globalmentor-core
+	public static UriPath relativizeResourceReference(final URI baseUri, final URI referenceUri, final boolean forceCollection) { //TODO extract to `UriPath` or `URIs` in globalmentor-core
 		return relativize(baseUri, forceCollection ? toCollectionURI(referenceUri) : referenceUri);
 	}
 
@@ -243,7 +247,7 @@ public interface Artifact {
 	/// @param baseUri The base URI to relativize against.
 	/// @param artifact The artifact whose resource reference to compute.
 	/// @return The resource reference as a URI path relative to the base URI.
-	public static URIPath relativizeResourceReference(final URI baseUri, final Artifact artifact) {
+	public static UriPath relativizeResourceReference(final URI baseUri, final Artifact artifact) {
 		return relativizeResourceReference(baseUri, artifact.getTargetPath().toUri(), artifact instanceof CollectionArtifact);
 	}
 

@@ -117,7 +117,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 		return Set.of(USER_AGENT_IDENTIFICATION);
 	}
 
-	private final String profile;
+	private final String profile; //TODO adopt `dev.flange.aws.def.AwsProfile`
 
 	/// Returns the AWS profile if one was set explicitly.
 	/// @return The AWS profile if one was set explicitly.
@@ -215,8 +215,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 				}).certificateArn();
 			} else {
 				if(existingCertificateSummaries.size() > 1) {
-					throw new IOException(
-							"Multiple certificates per domain not supported; please remove all but one certificates for domain `%s`.".formatted(domain));
+					throw new IOException("Multiple certificates per domain not supported; please remove all but one certificates for domain `%s`.".formatted(domain));
 				}
 				certificateArn = getOnly(existingCertificateSummaries).certificateArn();
 			}
@@ -265,7 +264,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 			for(final DomainValidation domainValidation : domainValidations) {
 				switch(domainValidation.validationStatus()) {
 					case SUCCESS -> //already validated
-						logger.debug("Certificate `{}` for domain name `{}` has been validated.", certificateArn, domainValidation.domainName());
+							logger.debug("Certificate `{}` for domain name `{}` has been validated.", certificateArn, domainValidation.domainName());
 					case PENDING_VALIDATION -> {
 						if(domainValidation.validationMethod().equals(ValidationMethod.DNS)) {
 							final software.amazon.awssdk.services.acm.model.ResourceRecord resourceRecord = domainValidation.resourceRecord();
@@ -285,11 +284,11 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 						pendingValidationDomainNames.add(domainValidation.domainName());
 					}
 					case FAILED -> throw new IOException(
-							"Certificate `%s` for domain name `%s` failed validation: `%s`. Please delete the certificate, correct any problems, and deploy again.".formatted(
-									certificateArn, domainValidation.domainName(), certificateDetail.failureReason()));
+							"Certificate `%s` for domain name `%s` failed validation: `%s`. Please delete the certificate, correct any problems, and deploy again."
+									.formatted(certificateArn, domainValidation.domainName(), certificateDetail.failureReason()));
 					default -> throw new IOException(
-							"Unable to validate certificate `%s` for domain name `%s`; validation status indicates `%s`. Please delete the certificate and deploy again.".formatted(
-									certificateArn, domainValidation.domainName(), domainValidation.validationStatus()));
+							"Unable to validate certificate `%s` for domain name `%s`; validation status indicates `%s`. Please delete the certificate and deploy again."
+									.formatted(certificateArn, domainValidation.domainName(), domainValidation.validationStatus()));
 				}
 			}
 			if(!pendingValidationDomainNames.isEmpty()) {

@@ -20,6 +20,16 @@
 		</dependency>
 
 		<dependency>
+			<groupId>dev.flange</groupId>
+			<artifactId>flange-deploy-aws</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>dev.flange</groupId>
+			<artifactId>flange-env-aws</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-awt</artifactId>
 		</dependency>
