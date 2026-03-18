@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 import org.jspecify.annotations.*;
 
-import com.globalmentor.net.URIPath;
+import com.globalmentor.net.UriPath;
 
 /// A plan for mummifying a site.
 /// @author Garret Wilson
@@ -108,7 +108,7 @@ public interface MummyPlan {
 	/// @return The artifact referred to by a relative path source reference.
 	/// @throws IllegalArgumentException if the given reference path is absolute.
 	/// @see #getPrincipalArtifact(Artifact)
-	public default Optional<Artifact> findArtifactBySourceRelativeReference(@NonNull final Artifact artifact, @NonNull final URIPath sourceRelativeReference) {
+	public default Optional<Artifact> findArtifactBySourceRelativeReference(@NonNull final Artifact artifact, @NonNull final UriPath sourceRelativeReference) {
 		return findArtifactBySourceRelativeReference(getPrincipalArtifact(artifact).getSourcePath(), sourceRelativeReference);
 	}
 
@@ -121,7 +121,7 @@ public interface MummyPlan {
 	///
 	/// This method follows [RFC 3986](https://tools.ietf.org/html/rfc3986) and resolves a relative reference of the empty string by using the source
 	/// relative reference e.g. `/foo/bar`, not as the parent collection `/foo/`.
-	/// @apiNote If possible [#findArtifactBySourceRelativeReference(Artifact, URIPath)] should be used to ensure that the reference is calculated from the
+	/// @apiNote If possible [#findArtifactBySourceRelativeReference(Artifact, UriPath)] should be used to ensure that the reference is calculated from the
 	///          principal artifact as the referring artifact.
 	/// @param contextSourcePath The source path the relative reference should be resolved against when finding the referent artifact.
 	/// @param sourceRelativeReference The relative URI path being used as a reference to some artifact.
@@ -129,14 +129,14 @@ public interface MummyPlan {
 	/// @throws IllegalArgumentException if the context source path is not absolute.
 	/// @throws IllegalArgumentException if the given reference path is absolute.
 	public default Optional<Artifact> findArtifactBySourceRelativeReference(@NonNull final Path contextSourcePath,
-			@NonNull final URIPath sourceRelativeReference) {
+			@NonNull final UriPath sourceRelativeReference) {
 		checkArgumentAbsolute(contextSourcePath);
-		sourceRelativeReference.checkRelative();
+		UriPath.checkArgumentRelative(sourceRelativeReference);
 		//Resolve the relative path to the URI form of the context artifact path, and then convert that back to a file system path.
 		//Follow RFC 3986 by interpreting resolution to "" as returning the context source path itself, not the collection/directory path.
-		final URI sourceRelativeReferenceURI = sourceRelativeReference.toURI();
+		final URI sourceRelativeReferenceURI = sourceRelativeReference.toUri();
 		final Path referenceSourcePath = sourceRelativeReferenceURI.equals(EMPTY_PATH_URI) ? contextSourcePath
-				: Paths.get(contextSourcePath.toUri().resolve(sourceRelativeReference.toURI()));
+				: Paths.get(contextSourcePath.toUri().resolve(sourceRelativeReference.toUri()));
 		return findArtifactBySourceReference(referenceSourcePath);
 	}
 
@@ -168,7 +168,7 @@ public interface MummyPlan {
 	/// @return The resource reference path from the first given artifact to the second given artifact in the terms of the source tree.
 	/// @see #getPrincipalArtifact(Artifact)
 	/// @see Artifact#getSourcePath()
-	public URIPath referenceInSource(@NonNull final Artifact fromArtifact, @NonNull final Artifact toArtifact);
+	public UriPath referenceInSource(@NonNull final Artifact fromArtifact, @NonNull final Artifact toArtifact);
 
 	/// Returns a resource reference from one artifact to another in the target tree. The returned reference will be a relative URI path appropriate to be used as
 	/// a web reference.
@@ -180,7 +180,7 @@ public interface MummyPlan {
 	/// @return The resource reference path from the first given artifact to the second given artifact in the terms of the target tree.
 	/// @see #getPrincipalArtifact(Artifact)
 	/// @see Artifact#getTargetPath()
-	public URIPath referenceInTarget(@NonNull final Artifact fromArtifact, @NonNull final Artifact toArtifact);
+	public UriPath referenceInTarget(@NonNull final Artifact fromArtifact, @NonNull final Artifact toArtifact);
 
 	//# MEXL
 
@@ -191,7 +191,7 @@ public interface MummyPlan {
 	/// @param toArtifact The artifact being referred to.
 	/// @return The resource reference path from the first given artifact to the second given artifact in the terms of the source tree.
 	/// @see #referenceInSource(Artifact, Artifact)
-	public default URIPath reference(@NonNull final Artifact fromArtifact, @NonNull final Artifact toArtifact) {
+	public default UriPath reference(@NonNull final Artifact fromArtifact, @NonNull final Artifact toArtifact) {
 		return referenceInSource(fromArtifact, toArtifact);
 	}
 

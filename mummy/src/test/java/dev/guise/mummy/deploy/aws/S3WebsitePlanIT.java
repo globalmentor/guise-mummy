@@ -76,7 +76,7 @@ class S3WebsitePlanIT {
 		final Map<String, S3DeployObject> deployObjects = s3Website.getDeployObjectsByKey();
 		assertThat("deploy object at content key", deployObjects, hasKey("section/index"));
 		assertThat("no deploy object at collection key", deployObjects, not(hasKey("section/")));
-		final S3ArtifactDeployObject deployObject = (S3ArtifactDeployObject) deployObjects.get("section/index");
+		final S3ArtifactDeployObject deployObject = (S3ArtifactDeployObject)deployObjects.get("section/index");
 		assertThat("artifact is the directory", deployObject.getArtifact(), is(directory));
 		assertThat("content path from content artifact", deployObject.getContentFile(), is(contentTargetFile));
 	}
@@ -98,8 +98,7 @@ class S3WebsitePlanIT {
 		final Optional<S3ArtifactRedirectDeployObject> foundRedirect = s3Website.getDeployObjectsByKey().values().stream()
 				.filter(S3ArtifactRedirectDeployObject.class::isInstance).map(S3ArtifactRedirectDeployObject.class::cast).findFirst();
 		// The routing rules may also contain the redirect if it requires a routing rule.
-		final S3ArtifactRedirectDeployObject redirect = foundRedirect
-				.or(() -> s3Website.getRoutingRuleRedirectObjects().stream().findFirst())
+		final S3ArtifactRedirectDeployObject redirect = foundRedirect.or(() -> s3Website.getRoutingRuleRedirectObjects().stream().findFirst())
 				.orElseThrow(() -> new AssertionError("no redirect found"));
 		assertThat("redirect target is collection reference", redirect.getRedirectTargetKey(), is("section/"));
 	}
@@ -130,7 +129,7 @@ class S3WebsitePlanIT {
 		s3Website.plan(context, rootTargetPathUri, page);
 		final Map<String, S3DeployObject> deployObjects = s3Website.getDeployObjectsByKey();
 		assertThat("deploy object at own key", deployObjects, hasKey("page.html"));
-		final S3ArtifactDeployObject deployObject = (S3ArtifactDeployObject) deployObjects.get("page.html");
+		final S3ArtifactDeployObject deployObject = (S3ArtifactDeployObject)deployObjects.get("page.html");
 		assertThat("content path is own target", deployObject.getContentFile(), is(pageTargetFile));
 	}
 
@@ -160,7 +159,7 @@ class S3WebsitePlanIT {
 	}
 
 	/// Tests that [S3Website#plan(MummyContext, URI, Artifact)] produces S3 keys that are canonical filesystem names —
-	/// decoded Unicode, with no percent-encoding artifacts leaked from the `Path.toUri()` → `URIPath` pipeline. Covers
+	/// decoded Unicode, with no percent-encoding artifacts leaked from the `Path.toUri()` → `UriPath` pipeline. Covers
 	/// non-ASCII (2-byte Latin, 3-byte CJK), spaces, URI-significant characters (`#`, `%`), and a mixed combination.
 	/// @see <a href="../../../../../../dev/issues/GUISE-230/designs/s3-key-encoding.md">S3 Key Encoding Design</a>
 	@Test

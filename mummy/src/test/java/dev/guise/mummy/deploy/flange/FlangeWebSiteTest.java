@@ -31,7 +31,7 @@ import java.util.*;
 import org.junit.jupiter.api.*;
 
 import com.globalmentor.net.MediaType;
-import com.globalmentor.net.URIPath;
+import com.globalmentor.net.UriPath;
 import com.globalmentor.security.Hash;
 
 import dev.flange.aws.s3.support.S3Synchronizer;
@@ -61,13 +61,13 @@ class FlangeWebSiteTest {
 		final Mummifier mummifier = mock(Mummifier.class);
 		final Artifact page = new DummyArtifact(mummifier, SOURCE_DIRECTORY.resolve("page.html"), TARGET_DIRECTORY.resolve("page.html"));
 		builder.addArtifact(page);
-		final var okRedirect = new RedirectEntry(URIPath.of("old.html"), URI.create("page.html"), Optional.empty());
-		final var warnedRedirect = new RedirectEntry(URIPath.of("external.html"), URI.create("https://example.com/"),
+		final var okRedirect = new RedirectEntry(UriPath.parse("old.html"), URI.create("page.html"), Optional.empty());
+		final var warnedRedirect = new RedirectEntry(UriPath.parse("external.html"), URI.create("https://example.com/"),
 				Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE));
 		final var summary = new PlanSummary(1, 0, 0, 0, 0, List.of(okRedirect, warnedRedirect));
 		final Manifest manifest = builder.build(summary);
-		assertThat("non-warning redirect extracted", manifest.redirects(), hasEntry(URIPath.of("old.html"), URI.create("page.html")));
-		assertThat("warning redirect filtered out", manifest.redirects(), not(hasKey(URIPath.of("external.html"))));
+		assertThat("non-warning redirect extracted", manifest.redirects(), hasEntry(UriPath.parse("old.html"), URI.create("page.html")));
+		assertThat("warning redirect filtered out", manifest.redirects(), not(hasKey(UriPath.parse("external.html"))));
 		assertThat("redirect count excludes warned entries", manifest.redirects(), aMapWithSize(1));
 		assertThat("artifact indexed by target path", manifest.artifactsByTargetPath().get(TARGET_DIRECTORY.resolve("page.html")), is(page));
 	}
@@ -76,7 +76,7 @@ class FlangeWebSiteTest {
 	@Test
 	void testManifestBuilderFilterAllWarnings() {
 		final var builder = new Manifest.Builder();
-		final var warned = new RedirectEntry(URIPath.of("bad.html"), URI.create("https://elsewhere.com/"), Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE));
+		final var warned = new RedirectEntry(UriPath.parse("bad.html"), URI.create("https://elsewhere.com/"), Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE));
 		final var summary = new PlanSummary(0, 0, 0, 0, 0, List.of(warned));
 		final Manifest manifest = builder.build(summary);
 		assertThat("all warned → empty redirects", manifest.redirects(), anEmptyMap());
@@ -137,8 +137,8 @@ class FlangeWebSiteTest {
 		final var manifestBuilder = new Manifest.Builder();
 		final PlanSummary summary = new PlanDescriber(plan).summarize((artifact, _) -> manifestBuilder.addArtifact(artifact));
 		final Manifest manifest = manifestBuilder.build(summary);
-		assertThat("redirect extracted for collection", manifest.redirects(), hasKey(URIPath.of("sub/old-sub/")));
-		assertThat("redirect target is the collection reference", manifest.redirects().get(URIPath.of("sub/old-sub/")), is(URI.create("sub/")));
+		assertThat("redirect extracted for collection", manifest.redirects(), hasKey(UriPath.parse("sub/old-sub/")));
+		assertThat("redirect target is the collection reference", manifest.redirects().get(UriPath.parse("sub/old-sub/")), is(URI.create("sub/")));
 		assertThat("content artifact indexed by its target path", manifest.artifactsByTargetPath(), hasKey(TARGET_DIRECTORY.resolve("sub").resolve("index.html")));
 		assertThat("directory indexed by its target path", manifest.artifactsByTargetPath(), hasKey(TARGET_DIRECTORY.resolve("sub")));
 	}

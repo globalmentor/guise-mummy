@@ -246,7 +246,7 @@ public class NavigationManager implements Clogged {
 			return Optional.of(DefaultNavigationItem.forReference(navigationReference.toString(), description, navigation));
 		}
 		//internal reference
-		final URIPath navigationReferencePath = URIs.findURIPath(navigationReference)
+		final UriPath navigationReferencePath = URIs.findUriPath(navigationReference)
 				.orElseThrow(() -> new IllegalArgumentException("Navigation reference <%s> does not have a path.".formatted(navigationReference)));
 		final Optional<Artifact> foundNavigationArtifact = context.getPlan().findArtifactBySourceRelativeReference(navigationListFileParent,
 				navigationReferencePath);
@@ -255,7 +255,7 @@ public class NavigationManager implements Clogged {
 		}
 		return foundNavigationArtifact.map(navigationArtifact -> {
 			//get the correct relative path to the artifact from this artifact (the plan will determine the principal artifact)
-			final URIPath artifactRelativeReferencePath = context.getPlan().referenceInSource(artifact, navigationArtifact);
+			final UriPath artifactRelativeReferencePath = context.getPlan().referenceInSource(artifact, navigationArtifact);
 			//change the reference path to get the appropriate href relative to the artifact
 			final String href = URIs.changePath(navigationReference, artifactRelativeReferencePath).toString();
 			return description != null ? DefaultNavigationItem.forArtifactReference(href, description, navigationArtifact, navigation)
@@ -319,7 +319,8 @@ public class NavigationManager implements Clogged {
 		try {
 			return navigationItemsFromUrfList(context, artifact, navigationFile, navigationObjects);
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			throw new IOException("Error in navigation file `%s`: %s".formatted(navigationFile, illegalArgumentException.getLocalizedMessage()), illegalArgumentException);
+			throw new IOException("Error in navigation file `%s`: %s".formatted(navigationFile, illegalArgumentException.getLocalizedMessage()),
+					illegalArgumentException);
 		}
 	}
 

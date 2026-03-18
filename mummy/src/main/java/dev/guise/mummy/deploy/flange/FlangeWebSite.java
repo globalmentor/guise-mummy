@@ -127,7 +127,7 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 	/// @param redirects The redirect mappings (site-relative percent-encoded source path → target URI),
 	///        extracted from [PlanSummary#sortedRedirects] with warning entries filtered out.
 	/// @param artifactsByTargetPath All artifacts encountered during the tree walk, indexed by their target path.
-	record Manifest(Map<URIPath, URI> redirects, Map<Path, Artifact> artifactsByTargetPath) {
+	record Manifest(Map<UriPath, URI> redirects, Map<Path, Artifact> artifactsByTargetPath) {
 		/// Validation constructor.
 		/// @implSpec Defensively copies both maps to ensure immutability.
 		Manifest {
@@ -151,7 +151,7 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 			/// @param summary The plan summary from which redirects are extracted.
 			/// @return A new immutable manifest.
 			Manifest build(final PlanSummary summary) {
-				final Map<URIPath, URI> redirects = summary.sortedRedirects().stream().filter(entry -> entry.optionalWarning().isEmpty())
+				final Map<UriPath, URI> redirects = summary.sortedRedirects().stream().filter(entry -> entry.optionalWarning().isEmpty())
 						.collect(toMap(PlanSummary.RedirectEntry::sourcePath, PlanSummary.RedirectEntry::targetUri));
 				return new Manifest(redirects, artifactsByTargetPath);
 			}

@@ -25,7 +25,7 @@ import java.util.*;
 
 import org.junit.jupiter.api.*;
 
-import com.globalmentor.net.URIPath;
+import com.globalmentor.net.UriPath;
 
 import dev.guise.mummy.plan.PlanSummary.*;
 
@@ -72,8 +72,8 @@ public class PlanSummaryTest {
 	@Test
 	void testBuilderSortsRedirects() {
 		final var builder = PlanSummary.builder();
-		final var redirectB = new RedirectEntry(URIPath.of("beta.html"), URI.create("new-beta.html"), Optional.empty());
-		final var redirectA = new RedirectEntry(URIPath.of("alpha.html"), URI.create("new-alpha.html"), Optional.empty());
+		final var redirectB = new RedirectEntry(UriPath.parse("beta.html"), URI.create("new-beta.html"), Optional.empty());
+		final var redirectA = new RedirectEntry(UriPath.parse("alpha.html"), URI.create("new-alpha.html"), Optional.empty());
 		builder.addRedirect(redirectB);
 		builder.addRedirect(redirectA);
 		final PlanSummary summary = builder.build();
@@ -86,8 +86,8 @@ public class PlanSummaryTest {
 	@Test
 	void testWarningCount() {
 		final var builder = PlanSummary.builder();
-		builder.addRedirect(new RedirectEntry(URIPath.of("ok.html"), URI.create("new-ok.html"), Optional.empty()));
-		builder.addRedirect(new RedirectEntry(URIPath.of("../../outside.html"), URI.create("page.html"), Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE)));
+		builder.addRedirect(new RedirectEntry(UriPath.parse("ok.html"), URI.create("new-ok.html"), Optional.empty()));
+		builder.addRedirect(new RedirectEntry(UriPath.parse("../../outside.html"), URI.create("page.html"), Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE)));
 		final PlanSummary summary = builder.build();
 		assertThat("warning count", summary.warningCount(), is(1L));
 	}
@@ -107,7 +107,7 @@ public class PlanSummaryTest {
 	/// Tests that the sorted redirects list is defensively copied and immutable.
 	@Test
 	void testSortedRedirectsDefensivelyCopied() {
-		final var redirect = new RedirectEntry(URIPath.of("old.html"), URI.create("new.html"), Optional.empty());
+		final var redirect = new RedirectEntry(UriPath.parse("old.html"), URI.create("new.html"), Optional.empty());
 		final var mutableList = new ArrayList<>(List.of(redirect));
 		final PlanSummary summary = new PlanSummary(0, 0, 0, 0, 0, mutableList);
 		mutableList.clear(); // mutate the source list

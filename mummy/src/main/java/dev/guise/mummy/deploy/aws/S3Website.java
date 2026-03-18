@@ -466,18 +466,18 @@ public class S3Website extends S3 {
 	/// @see Artifact#PROPERTY_TAG_MUMMY_ALT_LOCATION
 	@Override
 	protected void planResource(final MummyContext context, final URI rootTargetPathUri, final Artifact artifact,
-			final URIPath resourceReference, final Path contentFile, final String key) throws IOException {
+			final UriPath resourceReference, final Path contentFile, final String key) throws IOException {
 		super.planResource(context, rootTargetPathUri, artifact, resourceReference, contentFile, key);
 		artifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION).filter(CharSequence.class::isInstance).map(Object::toString)
-				.map(URIPath::of).map(altLocationReference -> resolve(artifact.getTargetPath().toUri(), altLocationReference)) //convert to absolute file system URI
-				.map(altLocationUri -> URIPath.relativize(rootTargetPathUri, altLocationUri)) //relativize to the site root
+				.map(UriPath::parse).map(altLocationReference -> resolve(artifact.getTargetPath().toUri(), altLocationReference)) //convert to absolute file system URI
+				.map(altLocationUri -> UriPath.relativize(rootTargetPathUri, altLocationUri)) //relativize to the site root
 				.ifPresent(throwingConsumer(altLocationReference -> {
 					if(!altLocationReference.isSubPath()) {
 						throw new IOException("Artifact for resource %s specifies an alternative location %s which is outside the site boundaries.".formatted(
 								resourceReference, altLocationReference));
 					}
-					final String altKey = altLocationReference.toDecodedString(); // canonical resource name, not URI-encoded
-					final String artifactKey = resourceReference.toDecodedString(); // canonical resource name, not URI-encoded
+					final String altKey = URIs.decode(altLocationReference.toString()); // canonical resource name, not URI-encoded
+					final String artifactKey = URIs.decode(resourceReference.toString()); // canonical resource name, not URI-encoded
 					getLogger().debug("Planning deployment redirect for artifact {} from S3 key `{}` to S3 key `{}`.", artifact, altKey, artifactKey);
 					final S3ArtifactRedirectDeployObject redirectDeployObject = new S3ArtifactRedirectDeployObject(altKey, artifactKey, artifact);
 					if(redirectDeployObject.isRoutingRuleRequired()) { //set up the redirect initialize as if `object` redirect means were specified
@@ -498,7 +498,7 @@ public class S3Website extends S3 {
 		if(deployObject instanceof S3ArtifactRedirectDeployObject redirectDeployObject) {
 			//The redirect path must be absolute, and the must be encoded, presumably because this is the literal HTTP `Location` header content.
 			//See https://tools.ietf.org/html/rfc7231#section-7.1.2 .
-			builder.websiteRedirectLocation(URIPath.encode(ROOT_PATH + redirectDeployObject.getRedirectTargetKey()));
+			builder.websiteRedirectLocation(UriPath.encode(ROOT_PATH + redirectDeployObject.getRedirectTargetKey()));
 		}
 		return builder;
 	}

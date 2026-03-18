@@ -356,7 +356,7 @@ public class S3 implements DeployTarget, Clogged {
 
 	/// Plans deployment of a site for an artifact and its comprised artifacts.
 	/// @implSpec For each artifact with content this method calls
-	///           [#planResource(MummyContext, URI, Artifact, URIPath, Path, String)].
+	///           [#planResource(MummyContext, URI, Artifact, UriPath, Path, String)].
 	///           For a [DirectoryArtifact], the content is found via its content artifact; for other artifacts, the
 	///           artifact is its own content. Recursion into [CompositeArtifact] children skips subsumed artifacts:
 	///           a directory's content artifact is already planned above, and other subsumed artifact types are not
@@ -366,7 +366,7 @@ public class S3 implements DeployTarget, Clogged {
 	/// @param artifact The current artifact for which deployment is being planned.
 	/// @throws IOException if there is an I/O error during site deployment planning.
 	protected void plan(@NonNull final MummyContext context, @NonNull final URI rootTargetPathUri, @NonNull Artifact artifact) throws IOException {
-		final URIPath resourceReference = Artifact.relativizeResourceReference(rootTargetPathUri, artifact);
+		final UriPath resourceReference = Artifact.relativizeResourceReference(rootTargetPathUri, artifact);
 		// Determine the content artifact: a `DirectoryArtifact` has a designated content artifact (e.g. `index.xhtml`);
 		// other artifacts are their own content. This ties the deployer to the `DirectoryArtifact` implementation type;
 		// in the future `CollectionArtifact` could provide a general abstraction for finding collection content.
@@ -382,7 +382,7 @@ public class S3 implements DeployTarget, Clogged {
 			foundContentArtifact = Optional.of(artifact); // by default the artifact provides its own content
 		}
 		foundContentArtifact.ifPresent(throwingConsumer(contentArtifact -> { // on S3, only artifacts with content can be uploaded
-			final String s3Key = Artifact.relativizeResourceReference(rootTargetPathUri, contentArtifact).toDecodedString(); //canonical resource name—decoded form matches filesystem name
+			final String s3Key = URIs.decode(Artifact.relativizeResourceReference(rootTargetPathUri, contentArtifact).toString()); //canonical resource name—decoded form matches filesystem name
 			planResource(context, rootTargetPathUri, artifact, resourceReference, contentArtifact.getTargetPath(), s3Key);
 		}));
 		if(artifact instanceof CompositeArtifact compositeArtifact) { // recurse into non-subsumed comprised artifacts
@@ -410,7 +410,7 @@ public class S3 implements DeployTarget, Clogged {
 	/// @param key The S3 key at which the object (content and metadata) will be stored.
 	/// @throws IOException if there is an I/O error during site deployment planning.
 	protected void planResource(@NonNull final MummyContext context, @NonNull final URI rootTargetPathUri, @NonNull Artifact artifact,
-			@NonNull final URIPath resourceReference, @NonNull final Path contentFile, @NonNull final String key) throws IOException {
+			@NonNull final UriPath resourceReference, @NonNull final Path contentFile, @NonNull final String key) throws IOException {
 		getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
 		getDeployObjectsByKey().put(key, new S3ArtifactDeployObject(key, artifact, contentFile));
 	}

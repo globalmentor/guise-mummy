@@ -83,10 +83,6 @@ class ArtifactTest {
 
 	/// Tests that [Artifact#relativizeResourceReference(URI, Artifact)] produces percent-encoded paths
 	/// when the artifact's target path contains non-ASCII characters.
-	///
-	/// @implNote This test targets the `URIPath` encoding gap: `Path.toUri()` on OpenJDK/Windows leaves non-ASCII
-	///           characters as literal code points in the raw path, and `URIPath` propagates them without normalization.
-	@Disabled("Blocked on URIPath revamp: URIPath does not normalize encoding at construction time")
 	@Test
 	void testRelativizeResourceReferenceProducesEncodedPathForNonAsciiArtifact() {
 		final PageMummifier pageMummifier = mock(PageMummifier.class);

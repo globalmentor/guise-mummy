@@ -31,7 +31,7 @@ import java.util.*;
 
 import org.junit.jupiter.api.*;
 
-import com.globalmentor.net.URIPath;
+import com.globalmentor.net.UriPath;
 
 import dev.guise.mummy.*;
 import dev.guise.mummy.mummify.Mummifier;
@@ -132,7 +132,7 @@ public class PlanDescriberTest {
 		final Mummifier mummifier = mock(Mummifier.class);
 		final DirectoryArtifact root = new DirectoryArtifact(mummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, null, Set.of());
 		final MummyPlan plan = new DefaultMummyPlan(root);
-		final var redirect = new RedirectEntry(URIPath.of("old.html"), URI.create("new.html"), Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE));
+		final var redirect = new RedirectEntry(UriPath.parse("old.html"), URI.create("new.html"), Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE));
 		final PlanSummary summary = new PlanSummary(5, 2, 3, 1, 1, List.of(redirect));
 		final StringBuilder output = new StringBuilder();
 		planDescriber(plan).writeTo(output, summary, true);
@@ -450,11 +450,6 @@ public class PlanDescriberTest {
 	/// when the artifact's target path contains non-ASCII characters. The redirect source path and target URI
 	/// must be in RFC 3986 percent-encoded form, because downstream consumers such as `AwsFlangeDeployer.assembleSiteSettings()`
 	/// use them as KVS keys matched against CloudFront's percent-encoded `event.request.uri`.
-	///
-	/// @implNote This test targets the `URIPath` encoding gap: `Path.toUri()` on OpenJDK/Windows leaves non-ASCII
-	///           characters as literal code points in the raw path (e.g. `café` instead of `caf%C3%A9`), and `URIPath`
-	///           propagates them without normalization.
-	@Disabled("Blocked on URIPath revamp: URIPath does not normalize encoding at construction time")
 	@Test
 	void testFindRedirectProducesEncodedPathsForNonAsciiArtifact() {
 		final PageMummifier pageMummifier = mock(PageMummifier.class);
@@ -475,10 +470,10 @@ public class PlanDescriberTest {
 	/// Tests that [PlanSummary.RedirectEntry] sorts flat by decoded source path, case-insensitive.
 	@Test
 	void testRedirectEntrySorting() {
-		final var collectionB = new RedirectEntry(URIPath.of("beta/"), URI.create("new-beta/"), Optional.empty());
-		final var collectionA = new RedirectEntry(URIPath.of("alpha/"), URI.create("new-alpha/"), Optional.empty());
-		final var pageB = new RedirectEntry(URIPath.of("b-page.html"), URI.create("new-b.html"), Optional.empty());
-		final var pageA = new RedirectEntry(URIPath.of("a-page.html"), URI.create("new-a.html"), Optional.empty());
+		final var collectionB = new RedirectEntry(UriPath.parse("beta/"), URI.create("new-beta/"), Optional.empty());
+		final var collectionA = new RedirectEntry(UriPath.parse("alpha/"), URI.create("new-alpha/"), Optional.empty());
+		final var pageB = new RedirectEntry(UriPath.parse("b-page.html"), URI.create("new-b.html"), Optional.empty());
+		final var pageA = new RedirectEntry(UriPath.parse("a-page.html"), URI.create("new-a.html"), Optional.empty());
 		final var sorted = new ArrayList<>(List.of(pageB, collectionB, pageA, collectionA));
 		Collections.sort(sorted);
 		assertThat("sorted flat by decoded source path, case-insensitive", sorted, contains(pageA, collectionA, pageB, collectionB));

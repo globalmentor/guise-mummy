@@ -216,7 +216,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/// @throws IllegalArgumentException if the information of the navigation artifacts prevent them from being ordered.
 	protected Stream<NavigationItem> defaultNavigation(@NonNull MummyContext context, @NonNull final Artifact artifact) {
 		return defaultNavigationArtifacts(context, artifact).map(navigationArtifact -> { //map navigation artifacts to their navigation items
-			//TODO add non-ASCII test to verify expected encoding form; determine whether the href value should be percent-encoded or literal after the `URIPath` revamp (see FLANGE-88 `URIPath` Revamp TODO)
 			final String href = context.getPlan().referenceInSource(artifact, navigationArtifact).toString();
 			return DefaultNavigationItem.forArtifactReference(href, navigationArtifact);
 		});
@@ -1014,7 +1013,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			//see if the href is a relative link back to this artifact, and if so use the template for an active link;
 			final boolean isSelfHref = navigationItem.findHref().map(URI::create).filter(not(URI::isAbsolute)) //assume absolute (external) URIs do not reference this artifact
 					.filter(not(uri -> uri.getRawFragment() != null)) //ignore fragment references; the static page doesn't know when/if the browser includes the fragment
-					.flatMap(URIs::findURIPath).flatMap(relativeReference -> context.getPlan().findArtifactBySourceRelativeReference(artifact, relativeReference))
+					.flatMap(URIs::findUriPath).flatMap(relativeReference -> context.getPlan().findArtifactBySourceRelativeReference(artifact, relativeReference))
 					.map(principalArtifact::equals).orElse(false); //the link target is normalized to the principal artifact, which is what we use to compare
 			final Element liTemplate = isSelfHref ? activeLiTemplate : inactiveLiTemplate;
 			final Element liElement = (Element)liTemplate.cloneNode(true);
@@ -1097,7 +1096,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/// @implSpec This implementation does not allow the document element to be removed or replaced.
 	@Override
 	public Document relocateDocument(@NonNull MummyContext context, @NonNull final Document sourceDocument, @NonNull final Path originalReferrerSourcePath,
-			final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException {
+			final Function<Artifact, UriPath> referenceGenerator) throws IOException, DOMException {
 		final List<Element> relocatedElements = relocateElement(context, sourceDocument.getDocumentElement(), originalReferrerSourcePath, referenceGenerator);
 		if(relocatedElements.size() != 1 || relocatedElements.get(0) != sourceDocument.getDocumentElement()) {
 			throw new UnsupportedOperationException("Document element cannot be removed or replaced when relocating a document.");
@@ -1116,7 +1115,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/// @throws DOMException if there is some error manipulating the XML document object model.
 	/// @see #HTML_REFERENCE_ELEMENT_ATTRIBUTES
 	protected List<Element> relocateElement(@NonNull MummyContext context, @NonNull final Element sourceElement, @NonNull final Path originalReferrerSourcePath,
-			final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException {
+			final Function<Artifact, UriPath> referenceGenerator) throws IOException, DOMException {
 
 		//always relocate child elements, even if this element is to be relocated, to handle e.g. an image within a link
 		relocateChildElements(context, sourceElement, originalReferrerSourcePath, referenceGenerator);
@@ -1143,7 +1142,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/// @throws IOException if there is an error relocating the child elements.
 	/// @throws DOMException if there is some error manipulating the XML document object model.
 	protected void relocateChildElements(@NonNull MummyContext context, @NonNull final Element sourceElement, @NonNull final Path originalReferrerSourcePath,
-			final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException {
+			final Function<Artifact, UriPath> referenceGenerator) throws IOException, DOMException {
 		final NodeList childNodes = sourceElement.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);
@@ -1172,7 +1171,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/// @throws DOMException if there is some error manipulating the XML document object model.
 	/// @see #retargetResourceReference(MummyContext, URI, Path, Function)
 	protected List<Element> relocateReferenceElement(@NonNull MummyContext context, @NonNull final Element referenceElement,
-			@NonNull final String referenceAttributeName, @NonNull final Path originalReferrerSourcePath, final Function<Artifact, URIPath> referenceGenerator)
+			@NonNull final String referenceAttributeName, @NonNull final Path originalReferrerSourcePath, final Function<Artifact, UriPath> referenceGenerator)
 			throws IOException, DOMException {
 		findAttributeNS(referenceElement, null, referenceAttributeName).ifPresent(referenceString -> {
 			getLogger().trace("  - found reference <{} {}=\"{}\" ...>", referenceElement.getNodeName(), referenceAttributeName, referenceString);
@@ -1185,7 +1184,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					if(referencePath != null && !referencePath.isEmpty() && !URIs.isPathAbsolute(referencePath)) { //only convert relative paths that are not self-references ("")
 						retargetResourceReference(context, referenceURI, originalReferrerSourcePath, referenceGenerator).ifPresentOrElse(retargetedResourceReference -> {
 							getLogger().trace("  -> mapping to : {}", retargetedResourceReference);
-							//TODO add non-ASCII test to verify expected encoding form; determine whether the attribute value should be percent-encoded per RFC 3986 or left as literal characters, especially after the `URIPath` revamp normalizes `toString()` to always produce encoded output
 							referenceElement.setAttributeNS(null, referenceAttributeName, retargetedResourceReference.toString());
 						}, () -> getLogger().warn("No target artifact found for source relative reference `{}` in `{}`.", referenceURI, originalReferrerSourcePath));
 					}
@@ -1214,8 +1212,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/// @throws IllegalArgumentException if the relocated referred path is not in the site source or target tree.
 	/// @throws IllegalArgumentException if the referent artifact path is not in the same source/target tree as the relocated referrer path.
 	protected Optional<URI> retargetResourceReference(@NonNull MummyContext context, @NonNull URI resourceReference,
-			@NonNull final Path originalReferrerSourcePath, final Function<Artifact, URIPath> referenceGenerator) {
-		final URIPath resourceReferencePath = URIs.findURIPath(resourceReference)
+			@NonNull final Path originalReferrerSourcePath, final Function<Artifact, UriPath> referenceGenerator) {
+		final UriPath resourceReferencePath = URIs.findUriPath(resourceReference)
 				.orElseThrow(() -> new IllegalArgumentException("Resource reference %s has no path.".formatted(resourceReference)));
 		return retargetResourceReferencePath(context, resourceReferencePath, originalReferrerSourcePath, referenceGenerator) //retarget the path separately
 				.map(retargetedResourceReferencePath -> URIs.changePath(resourceReference, retargetedResourceReferencePath)); //switch the path of the original reference
@@ -1237,8 +1235,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/// @throws IllegalArgumentException if the original referrer source path is not absolute and/or is not within the site source tree.
 	/// @throws IllegalArgumentException if the relocated referred path is not in the site source or target tree.
 	/// @throws IllegalArgumentException if the referent artifact path is not in the same source/target tree as the relocated referrer path.
-	protected Optional<URIPath> retargetResourceReferencePath(@NonNull MummyContext context, @NonNull URIPath resourceReferencePath,
-			@NonNull final Path originalReferrerSourcePath, final Function<Artifact, URIPath> referenceGenerator) {
+	protected Optional<UriPath> retargetResourceReferencePath(@NonNull MummyContext context, @NonNull UriPath resourceReferencePath,
+			@NonNull final Path originalReferrerSourcePath, final Function<Artifact, UriPath> referenceGenerator) {
 		return context.getPlan().findArtifactBySourceRelativeReference(context.checkArgumentSourcePath(originalReferrerSourcePath), resourceReferencePath)
 				.map(referenceGenerator::apply);
 	}

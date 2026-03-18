@@ -23,7 +23,7 @@ import java.nio.file.Path;
 
 import org.jspecify.annotations.*;
 
-import com.globalmentor.net.URIPath;
+import com.globalmentor.net.UriPath;
 
 /// Abstract base plan for mummifying a site.
 /// @author Garret Wilson
@@ -43,13 +43,13 @@ public abstract class AbstractMummyPlan implements MummyPlan {
 	}
 
 	@Override
-	public URIPath referenceInSource(final Artifact fromArtifact, final Artifact toArtifact) {
+	public UriPath referenceInSource(final Artifact fromArtifact, final Artifact toArtifact) {
 		return relativizeResourceReference(getPrincipalArtifact(fromArtifact).getSourcePath(), toArtifact.getSourcePath(),
 				toArtifact instanceof CollectionArtifact);
 	}
 
 	@Override
-	public URIPath referenceInTarget(final Artifact fromArtifact, final Artifact toArtifact) {
+	public UriPath referenceInTarget(final Artifact fromArtifact, final Artifact toArtifact) {
 		return relativizeResourceReference(getPrincipalArtifact(fromArtifact).getTargetPath(), toArtifact.getTargetPath(),
 				toArtifact instanceof CollectionArtifact);
 	}
@@ -67,7 +67,7 @@ public abstract class AbstractMummyPlan implements MummyPlan {
 	/// @throws IllegalArgumentException if the target path and or the base path is not absolute and/or is not within the same source/target tree as per the root
 	///           artifact.
 	/// @see #getRootArtifact()
-	protected URIPath relativizeResourceReference(@NonNull final Path basePath, @NonNull final Path referencePath, final boolean forceCollection) {
+	protected UriPath relativizeResourceReference(@NonNull final Path basePath, @NonNull final Path referencePath, final boolean forceCollection) {
 		final Path root = isSubPath(getRootArtifact().getSourcePath(), basePath) ? getRootArtifact().getSourcePath() : getRootArtifact().getTargetPath();
 		return Artifact.relativizeResourceReference(checkArgumentSubPath(root, checkArgumentAbsolute(basePath)).toUri(),
 				checkArgumentSubPath(root, checkArgumentAbsolute(referencePath)).toUri(), forceCollection);

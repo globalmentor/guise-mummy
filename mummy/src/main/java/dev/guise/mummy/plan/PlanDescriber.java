@@ -26,7 +26,7 @@ import java.util.*;
 
 import org.jspecify.annotations.*;
 
-import com.globalmentor.net.URIPath;
+import com.globalmentor.net.UriPath;
 
 import dev.guise.mummy.*;
 import dev.guise.mummy.mummify.image.ImageMummifier;
@@ -147,7 +147,7 @@ public class PlanDescriber {
 
 	/// Examines an artifact for a `mummy/altLocation` property and returns the corresponding redirect entry, if any.
 	/// @implSpec This follows the same URI processing chain as `S3Website#planResource`:
-	///           parse as [URIPath], resolve against the artifact's target path URI (in collection form for collection
+	///           parse as [UriPath], resolve against the artifact's target path URI (in collection form for collection
 	///           artifacts), relativize against the site root, and check for site-boundary violations.
 	/// @param rootTargetPathUri The URI of the site root target path for relativization.
 	/// @param artifact The artifact to check.
@@ -155,11 +155,11 @@ public class PlanDescriber {
 	static Optional<RedirectEntry> findRedirect(@NonNull final URI rootTargetPathUri, @NonNull final Artifact artifact) {
 		requireNonNull(rootTargetPathUri);
 		return artifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION).filter(CharSequence.class::isInstance).map(Object::toString)
-				.map(URIPath::of).map(altLocationReference -> {
+				.map(UriPath::parse).map(altLocationReference -> {
 					final URI artifactTargetUri = artifact.getTargetPath().toUri();
 					return resolve(artifact instanceof CollectionArtifact ? toCollectionURI(artifactTargetUri) : artifactTargetUri, altLocationReference);
-				}).map(altLocationUri -> URIPath.relativize(rootTargetPathUri, altLocationUri)).map(altLocationReference -> {
-					final URIPath targetReference = Artifact.relativizeResourceReference(rootTargetPathUri, artifact);
+				}).map(altLocationUri -> UriPath.relativize(rootTargetPathUri, altLocationUri)).map(altLocationReference -> {
+					final UriPath targetReference = Artifact.relativizeResourceReference(rootTargetPathUri, artifact);
 					final Optional<PlanWarning> optionalWarning = altLocationReference.isSubPath() ? Optional.empty() : Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE);
 					return RedirectEntry.of(altLocationReference, targetReference, optionalWarning);
 				});

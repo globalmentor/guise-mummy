@@ -32,7 +32,7 @@ import org.jspecify.annotations.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.net.MediaType;
-import com.globalmentor.net.URIPath;
+import com.globalmentor.net.UriPath;
 import com.globalmentor.xml.def.NsName;
 
 import dev.guise.mummy.*;
@@ -285,6 +285,6 @@ public interface PageMummifier extends Mummifier {
 	/// @throws IOException if there is an error relocating the document.
 	/// @throws DOMException if there is some error manipulating the XML document object model.
 	public Document relocateDocument(@NonNull MummyContext context, @NonNull final Document sourceDocument, @NonNull final Path originalReferrerSourcePath,
-			@NonNull final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException;
+			@NonNull final Function<Artifact, UriPath> referenceGenerator) throws IOException, DOMException;
 
 }

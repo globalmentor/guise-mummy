@@ -24,7 +24,8 @@ import java.util.*;
 
 import org.jspecify.annotations.*;
 
-import com.globalmentor.net.URIPath;
+import com.globalmentor.net.URIs;
+import com.globalmentor.net.UriPath;
 
 /// Immutable summary of a [dev.guise.mummy.MummyPlan] analysis: artifact counts by category and the redirect inventory.
 ///
@@ -89,7 +90,7 @@ public record PlanSummary(long pageCount, long collectionCount, long imageCount,
 	/// @param sourcePath The site-relative path that triggers the redirect.
 	/// @param targetUri The redirect destination URI (site-relative or, in future, an absolute URL).
 	/// @param optionalWarning A diagnostic warning, if any.
-	public record RedirectEntry(URIPath sourcePath, URI targetUri,
+	public record RedirectEntry(UriPath sourcePath, URI targetUri,
 			Optional<PlanWarning> optionalWarning) implements Comparable<RedirectEntry> {
 		/// Validation constructor.
 		public RedirectEntry {
@@ -97,23 +98,23 @@ public record PlanSummary(long pageCount, long collectionCount, long imageCount,
 			requireNonNull(targetUri);
 			requireNonNull(optionalWarning);
 		}
-		/// Creates a redirect entry from a [URIPath] target reference, converting it to a [URI].
+		/// Creates a redirect entry from a [UriPath] target reference, converting it to a [URI].
 		/// @param sourcePath The site-relative path that triggers the redirect.
-		/// @param targetReference The artifact's current site-relative resource reference as a [URIPath].
+		/// @param targetReference The artifact's current site-relative resource reference as a [UriPath].
 		/// @param optionalWarning A diagnostic warning, if any.
 		/// @return A new redirect entry.
-		public static RedirectEntry of(final URIPath sourcePath, final URIPath targetReference,
+		public static RedirectEntry of(final UriPath sourcePath, final UriPath targetReference,
 				final Optional<PlanWarning> optionalWarning) {
-			return new RedirectEntry(sourcePath, targetReference.toURI(), optionalWarning);
+			return new RedirectEntry(sourcePath, targetReference.toUri(), optionalWarning);
 		}
 		/// @implSpec Entries are sorted case-insensitively by the decoded form of the source path.
 		@Override
 		public int compareTo(@NonNull final RedirectEntry other) {
-			//TODO switch to a segment-by-segment URIPath comparator when available in `globalmentor-core`,
+			//TODO switch to a segment-by-segment UriPath comparator when available in `globalmentor-core`,
 			// for more logical directory-level grouping (e.g. `a/b/c` before `a-suffix`)
 			return String.CASE_INSENSITIVE_ORDER.compare(
-					this.sourcePath.toDecodedString(),
-					other.sourcePath.toDecodedString());
+					URIs.decode(this.sourcePath.toString()),
+					URIs.decode(other.sourcePath.toString()));
 		}
 	}
 
