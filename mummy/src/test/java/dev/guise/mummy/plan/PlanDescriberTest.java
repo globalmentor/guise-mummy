@@ -446,6 +446,30 @@ public class PlanDescriberTest {
 		assertThat("no redirect for artifact without altLocation", foundRedirect, isEmpty());
 	}
 
+	/// Tests that [PlanDescriber#findRedirect(URI, Artifact)] produces percent-encoded redirect entries
+	/// when the artifact's target path contains non-ASCII characters. The redirect source path and target URI
+	/// must be in RFC 3986 percent-encoded form, because downstream consumers such as `AwsFlangeDeployer.assembleSiteSettings()`
+	/// use them as KVS keys matched against CloudFront's percent-encoded `event.request.uri`.
+	///
+	/// @implNote This test targets the `URIPath` encoding gap: `Path.toUri()` on OpenJDK/Windows leaves non-ASCII
+	///           characters as literal code points in the raw path (e.g. `café` instead of `caf%C3%A9`), and `URIPath`
+	///           propagates them without normalization.
+	@Disabled("Blocked on URIPath revamp: URIPath does not normalize encoding at construction time")
+	@Test
+	void testFindRedirectProducesEncodedPathsForNonAsciiArtifact() {
+		final PageMummifier pageMummifier = mock(PageMummifier.class);
+		final UrfObject description = new UrfObject();
+		description.setPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION, "old-page.html");
+		final Artifact page = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("caf\u00e9").resolve("page.html"), // café
+				TARGET_DIRECTORY.resolve("caf\u00e9").resolve("page.html"), // café
+				description);
+		final Optional<RedirectEntry> foundRedirect = PlanDescriber.findRedirect(ROOT_TARGET_PATH_URI, page);
+		assertThat("redirect found", foundRedirect, isPresentAnd(notNullValue()));
+		final var entry = foundRedirect.orElseThrow();
+		assertThat("source path is percent-encoded", entry.sourcePath().toString(), is("caf%C3%A9/old-page.html"));
+		assertThat("target URI is percent-encoded", entry.targetUri().toASCIIString(), is("caf%C3%A9/page.html"));
+	}
+
 	//## `RedirectEntry` sorting
 
 	/// Tests that [PlanSummary.RedirectEntry] sorts flat by decoded source path, case-insensitive.

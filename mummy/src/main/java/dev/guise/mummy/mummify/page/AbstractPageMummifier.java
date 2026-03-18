@@ -216,6 +216,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/// @throws IllegalArgumentException if the information of the navigation artifacts prevent them from being ordered.
 	protected Stream<NavigationItem> defaultNavigation(@NonNull MummyContext context, @NonNull final Artifact artifact) {
 		return defaultNavigationArtifacts(context, artifact).map(navigationArtifact -> { //map navigation artifacts to their navigation items
+			//TODO add non-ASCII test to verify expected encoding form; determine whether the href value should be percent-encoded or literal after the `URIPath` revamp (see FLANGE-88 `URIPath` Revamp TODO)
 			final String href = context.getPlan().referenceInSource(artifact, navigationArtifact).toString();
 			return DefaultNavigationItem.forArtifactReference(href, navigationArtifact);
 		});
@@ -1184,6 +1185,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					if(referencePath != null && !referencePath.isEmpty() && !URIs.isPathAbsolute(referencePath)) { //only convert relative paths that are not self-references ("")
 						retargetResourceReference(context, referenceURI, originalReferrerSourcePath, referenceGenerator).ifPresentOrElse(retargetedResourceReference -> {
 							getLogger().trace("  -> mapping to : {}", retargetedResourceReference);
+							//TODO add non-ASCII test to verify expected encoding form; determine whether the attribute value should be percent-encoded per RFC 3986 or left as literal characters, especially after the `URIPath` revamp normalizes `toString()` to always produce encoded output
 							referenceElement.setAttributeNS(null, referenceAttributeName, retargetedResourceReference.toString());
 						}, () -> getLogger().warn("No target artifact found for source relative reference `{}` in `{}`.", referenceURI, originalReferrerSourcePath));
 					}

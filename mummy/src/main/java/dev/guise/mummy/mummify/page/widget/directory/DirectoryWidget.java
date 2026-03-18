@@ -188,6 +188,7 @@ public class DirectoryWidget implements Widget {
 										//separator (will be ignored for the first item)
 										final Element separatorElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HR); //<hr/>
 										//title
+										//TODO add non-ASCII test to verify expected encoding form; determine whether the href value should be percent-encoded or literal after the `URIPath` revamp (see FLANGE-88 `URIPath` Revamp TODO)
 										final String postHref = context.getPlan().referenceInSource(artifact, item).toString();
 										final Element titleElement = createElement(document, ELEMENT_H(headingLevel)); //<h1>
 										final Element titleElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<h1><a>
@@ -231,6 +232,7 @@ public class DirectoryWidget implements Widget {
 									.flatMap(asInstance(LocalDate.class)).orElse(null), nullsLast(naturalOrder()))
 							.thenComparing(Artifact::determineTitle, titleCollator)).map(item -> { //map each item to `<li><a>title</a></li>`
 								final Element liElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI); //<li>
+								//TODO add non-ASCII test to verify expected encoding form; determine whether the href value should be percent-encoded or literal after the `URIPath` revamp (see FLANGE-88 `URIPath` Revamp TODO)
 								final String postHref = context.getPlan().referenceInSource(artifact, item).toString();
 								final Element liElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<li><a>
 								liElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
