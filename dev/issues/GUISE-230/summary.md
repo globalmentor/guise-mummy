@@ -48,8 +48,15 @@ Live testing revealed that `URIPath.toString()` returned literal non-ASCII chara
 - **DNS coexistence.** The legacy `Route53` deploy target discovers Flange-created hosted zones and upserts records into them. The initially planned DNS incompatibility warning was removed after empirical confirmation of seamless interop.
 - **Metadata resolution deferred to lookup time.** `FlangeWebSite`'s manifest indexes all artifacts by target path (including subsumed content artifacts) and uses `MummyPlan.getPrincipalArtifact()` at `findMetadata()` time to resolve them to their owning directory. This differs from `S3`'s plan-time pre-resolution but suits Flange's filesystem-driven deployment model.
 
+## Reopened: domain verification (2026-04-01)
+
+The ticket was reopened to address domain configuration handling during Flange deployment. During initial implementation, `FlangeWebSite.prepare()` logged a blanket warning that alternative domain redirects were "not supported with Flange deployment." This was incorrect — Flange environments do support web domain and alt web domain configuration, and Guise Mummy doesn't need to set them up independently.
+
+The blanket warning was replaced with inline domain verification that compares the Guise project's configured domains (`domain`, `site.domain`, `site.altDomains`) against the corresponding Flange environment exports (`DomainName`, `WebDomainName`, `AltWebDomainName`). A warning is logged only when the project specifies a value that doesn't match the resolved environment. Flange exports domain names without a trailing dot; comparison uses `DomainName.of(export).resolve(DomainName.ROOT)` to convert to absolute form, following the pattern established by Flange's own `EnvSpec`. For alt domains, the asymmetry between Guise (collection) and Flange (single value) is handled with distinct messages for absent/mismatched vs. excess-entry cases. The verification is advisory only — mismatches produce warnings, not errors, since the Guise project configuration is informational and doesn't control Flange infrastructure.
+
 ## Deferred work
 
+- **Aspect fingerprint bug ([GUISE-231]).** Discovered during Flange deployment: aspect artifacts (e.g. preview images) inherit the parent artifact's fingerprint on incremental builds because description loading is not aspect-aware. Flange's SHA-256 checksum validation exposed this pre-existing bug. Tracked in a separate ticket.
 - **Asset transformation bypass.** The "asset" designation only suppresses page generation; image mummifiers still transform large assets. A design was articulated (record asset status on `Artifact`; suppress `mummifyFile()` in `AbstractFileMummifier.mummify()` for assets) but deferred. See `todo - Asset Semantics Refinement.md`.
 - **`S3`/`S3Website` walker refactor.** The legacy deployers should adopt `ArtifactTreeWalker` to replace their manual recursive traversal. See `todo - S3 Walker Refactor.md`.
 - **`TextFileMummifier`.** `GenericFileMummifier` maps `.txt` → `text/plain` without charset detection. A future mummifier could detect encoding and produce `text/plain; charset=utf-8`.
