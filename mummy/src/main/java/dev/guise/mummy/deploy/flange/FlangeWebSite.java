@@ -16,6 +16,7 @@
 
 package dev.guise.mummy.deploy.flange;
 
+import static com.globalmentor.net.DomainName.*;
 import static com.globalmentor.util.Optionals.*;
 import static dev.flange.platform.aws.FlangePlatformAws.Templates.Exports.*;
 import static dev.guise.mummy.GuiseMummy.*;
@@ -305,9 +306,35 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 		flangeEnv.findSiteKeyValueStoreArn().orElseThrow(
 				() -> new ConfiguredStateException("Environment `%s` is not configured for site settings (missing output `%s`). Reprovision the environment."
 						.formatted(envName, SITE_KEY_VALUE_STORE_ARN)));
-		if(context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class).isPresent()) {
-			getLogger().atWarn().log("Alternative domain redirects (`{}`) are not supported with Flange deployment; ignoring.", CONFIG_KEY_SITE_ALT_DOMAINS);
-		}
+		//## verify domain configuration — warn if Guise project domains don't match the Flange environment
+		final var configuration = context.getConfiguration();
+		final var foundGuiseDomain = findConfiguredDomain(configuration);
+		foundGuiseDomain.ifPresent(guiseDomain -> {
+			final var foundFlangeDomain = flangeEnv.findOutput(DOMAIN_NAME).map(DomainName::of).map(ROOT::resolve);
+			if(!foundFlangeDomain.equals(foundGuiseDomain)) {
+				getLogger().atWarn().log("Project `{}` is `{}`, but Flange environment domain is{}.", CONFIG_KEY_DOMAIN, guiseDomain,
+						foundFlangeDomain.map(" `%s`"::formatted).orElse(" not configured"));
+			}
+		});
+		final var foundGuiseSiteDomain = findConfiguredSiteDomain(configuration);
+		foundGuiseSiteDomain.ifPresent(guiseSiteDomain -> {
+			final var foundFlangeWebDomain = flangeEnv.findOutput(WEB_DOMAIN_NAME).map(DomainName::of).map(ROOT::resolve);
+			if(!foundFlangeWebDomain.equals(foundGuiseSiteDomain)) {
+				getLogger().atWarn().log("Project `{}` is `{}`, but Flange environment web domain is{}.", CONFIG_KEY_SITE_DOMAIN, guiseSiteDomain,
+						foundFlangeWebDomain.map(" `%s`"::formatted).orElse(" not configured"));
+			}
+		});
+		findConfiguredSiteAltDomains(configuration).ifPresent(guiseAltDomains -> { // Guise allows multiple; Flange supports one
+			final var foundFlangeAltWebDomain = flangeEnv.findOutput(ALT_WEB_DOMAIN_NAME).map(DomainName::of).map(ROOT::resolve);
+			if(!foundFlangeAltWebDomain.filter(guiseAltDomains::contains).isPresent()) { // absent or not among them
+				getLogger().atWarn().log("Project configures `{}` ({}), but Flange environment alt web domain is{}.", CONFIG_KEY_SITE_ALT_DOMAINS,
+						guiseAltDomains.stream().map("`%s`"::formatted).collect(joining(", ")),
+						foundFlangeAltWebDomain.map(" `%s`, which is not among them"::formatted).orElse(" not configured"));
+			} else if(guiseAltDomains.size() > 1) { // Flange domain matches, but extras won't be handled
+				getLogger().atWarn().log("Project configures {} `{}` entries, but Flange supports only one alt web domain.", guiseAltDomains.size(),
+						CONFIG_KEY_SITE_ALT_DOMAINS);
+			}
+		});
 	}
 
 	@Override
