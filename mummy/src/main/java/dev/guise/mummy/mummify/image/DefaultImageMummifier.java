@@ -146,8 +146,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 
 		if(artifact instanceof AspectualArtifact aspectualArtifact) { //mummify any image aspects TODO generalize within framework
 			for(final Artifact aspectArtifact : aspectualArtifact.getAspects()) {
-				aspectArtifact.getResourceDescription().removeProperty(Content.MODIFIED_AT_PROPERTY_TAG); //use the absence of the `content/modifiedAt` property as a proxy flag to force writing (force the content to be considered dirty)
-				mummify(context, aspectArtifact);
+				mummify(context, aspectArtifact, true); // parent is being mummified → aspects must be mummified invariably
 			}
 		}
 	}

@@ -217,9 +217,9 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		Path currentSourcePath = sourcePath;
 		while(!currentSourcePath.equals(siteSourceDirectory)) {
 			final Path ancestorPath = currentSourcePath;
-			final String currentSourcePathFilename = findFilename(currentSourcePath).orElseThrow(
-					() -> new IllegalArgumentException("Source path `%s` ancestor `%s` has no filename; may not be inside site source directory `%s`.".formatted(sourcePath,
-							ancestorPath, siteSourceDirectory)));
+			final String currentSourcePathFilename = findFilename(currentSourcePath)
+					.orElseThrow(() -> new IllegalArgumentException("Source path `%s` ancestor `%s` has no filename; may not be inside site source directory `%s`."
+							.formatted(sourcePath, ancestorPath, siteSourceDirectory)));
 			if(assetNamePattern.matcher(currentSourcePathFilename).matches()) {
 				return true;
 			}
@@ -323,11 +323,12 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	}
 
 	/// {@inheritDoc}
+	/// @implSpec This implementation propagates `invariably` to all child artifacts.
 	/// @implSpec This implementation saves the description description if modified by calling [#saveTargetDescription(MummyContext, Artifact)].
 	@Override
-	public void mummify(final MummyContext context, final Artifact artifact) throws IOException {
-		final DirectoryArtifact directoryArtifact = checkArgumentIsInstance(artifact, DirectoryArtifact.class,
-				"Artifact `%s` is not a directory artifact.", artifact);
+	public void mummify(final MummyContext context, final Artifact artifact, final boolean invariably) throws IOException {
+		final DirectoryArtifact directoryArtifact = checkArgumentIsInstance(artifact, DirectoryArtifact.class, "Artifact `%s` is not a directory artifact.",
+				artifact);
 		checkArgumentDirectory(artifact.getSourcePath());
 
 		//create the directory if it doesn't exist
@@ -339,7 +340,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
 		//mummify the directory content artifact, if present
 		directoryArtifact.findContentArtifact().ifPresent(throwingConsumer(contentArtifact -> {
-			contentArtifact.getMummifier().mummify(context, contentArtifact);
+			contentArtifact.getMummifier().mummify(context, contentArtifact, invariably);
 			//Note that if a content file was once but no longer present, an orphaned content file
 			//description would be left, but the ways these circumstances could come about are
 			//largely theoretical (e.g. converting a source directory to an assets tree and
@@ -348,7 +349,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
 		//mummify each child artifact
 		for(final Artifact childArtifact : directoryArtifact.getChildArtifacts()) {
-			childArtifact.getMummifier().mummify(context, childArtifact);
+			childArtifact.getMummifier().mummify(context, childArtifact, invariably);
 		}
 	}
 

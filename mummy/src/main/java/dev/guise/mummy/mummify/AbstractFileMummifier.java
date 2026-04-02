@@ -161,8 +161,9 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	/// {@inheritDoc}
 	/// @apiNote This method cannot be overridden, as it performs necessary checks for incremental mummification. To implement file mummification,
 	///          [#mummifyFile(MummyContext, CorporealSourceArtifact)] should be overridden instead.
-	/// @implSpec If incremental mummification is enabled via [MummyContext#isIncremental()], this version checks the the timestamp of the target file, and
-	///           delegates to [#mummifyFile(MummyContext, CorporealSourceArtifact)] if the file needs regenerated.
+	/// @implSpec If `invariably` is `false` and incremental mummification is enabled via [MummyContext#isIncremental()], this implementation checks the
+	///           timestamp of the target file, and delegates to [#mummifyFile(MummyContext, CorporealSourceArtifact)] only if the file needs regenerated.
+	///           If `invariably` is `true`, the incremental check is bypassed entirely and mummification always proceeds.
 	/// @implSpec This implementation saves the description description if modified by calling [#saveTargetDescription(MummyContext, Artifact)].
 	/// @throws ClassCastException if the given artifact is not an instance of [CorporealSourceArtifact].
 	/// @see Content#MODIFIED_AT_PROPERTY_TAG
@@ -170,13 +171,13 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	/// @see MummyContext#isIncremental()
 	/// @see MummyContext#isFull()
 	@Override
-	public final void mummify(@NonNull final MummyContext context, @NonNull Artifact artifact) throws IOException {
+	public final void mummify(@NonNull final MummyContext context, @NonNull Artifact artifact, final boolean invariably) throws IOException {
 		getLogger().trace("Mummifying file artifact {} ...", artifact);
 		final Path targetFile = artifact.getTargetPath();
 		final UrfResourceDescription description = artifact.getResourceDescription();
 		final Optional<Instant> oldTargetModifiedAt;
 		final boolean targetContentDirty;
-		if(context.isIncremental()) {
+		if(!invariably && context.isIncremental()) {
 			oldTargetModifiedAt = exists(targetFile) ? Optional.of(getLastModifiedTime(targetFile).toInstant()) : Optional.empty();
 			targetContentDirty = description.findPropertyValue(Content.MODIFIED_AT_PROPERTY_TAG)
 					.map(modifiedAt -> !isPresentAndEquals(oldTargetModifiedAt, modifiedAt))
