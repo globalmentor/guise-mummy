@@ -18,11 +18,15 @@ package dev.guise.mummy.mummify.image;
 
 import static com.globalmentor.collections.iterators.Iterators.*;
 import static com.globalmentor.io.Images.*;
+import static com.globalmentor.io.Paths.*;
+import static dev.guise.mummy.AspectualArtifact.*;
 import static java.nio.file.Files.*;
 import static java.nio.file.StandardCopyOption.*;
 import static java.util.Collections.*;
+import static java.util.function.Function.*;
 import static java.util.stream.Collectors.*;
 import static javax.imageio.ImageIO.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import java.awt.*;
 import java.awt.geom.Dimension2D;
@@ -62,6 +66,9 @@ import io.urf.vocab.content.Content;
 /// @author Garret Wilson
 public class DefaultImageMummifier extends BaseImageMummifier {
 
+	/// The delimiter for appending an aspect ID to a filename.
+	private static final char FILENAME_ASPECT_DELIMITER = '-';
+
 	/// The default image aspect IDs.
 	/// @see #CONFIG_KEY_MUMMY_IMAGE_WITH_ASPECTS
 	public static final Set<String> DEFAULT_ASPECT_IDS = emptySet();
@@ -86,15 +93,25 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	/// {@inheritDoc}
 	/// @implSpec If the file size threshold for image processing is passed, this implementation creates an aspectual artifact with configured aspects (e.g.
 	///           `"preview"`).
+	/// @implNote Aspect descriptions are loaded using the main image as the source file. Because the aspect source paths (e.g. `foo-preview.jpg`) are
+	///           synthetic, the main image's modification timestamp serves as the staleness indicator for each aspect's cached description.
 	/// @see ImageMummifier#CONFIG_KEY_MUMMY_IMAGE_WITH_ASPECTS
 	@Override
 	protected Artifact createArtifact(final MummyContext context, final Path sourceFile, final Path outputFile, final UrfResourceDescription description)
 			throws IOException {
 		final Configuration config = context.getConfiguration();
 		if(size(sourceFile) > config.findLong(CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE).orElse(DEFAULT_SCALE_THRESHOLD_FILE_SIZE)) {
-			final Set<String> aspects = config.findCollection(CONFIG_KEY_MUMMY_IMAGE_WITH_ASPECTS).map(ids -> ids.stream().map(Object::toString).collect(toSet()))
-					.orElse(DEFAULT_ASPECT_IDS);
-			return DefaultSourceFileArtifact.builder(this, sourceFile, outputFile).withDescription(description).withAspects(aspects).build();
+			final Map<String, Artifact> aspectArtifacts = config.findCollection(CONFIG_KEY_MUMMY_IMAGE_WITH_ASPECTS) // configured aspect IDs (e.g. "preview")
+					.map(ids -> ids.stream().map(Object::toString)).orElseGet(DEFAULT_ASPECT_IDS::stream) // fall back to defaults (empty by default)
+					.collect(toUnmodifiableMap(identity(), throwingFunction(aspectId -> { // build each aspect artifact with its own loaded description
+						final Path aspectSourcePath = appendFilenameBase(sourceFile, FILENAME_ASPECT_DELIMITER + aspectId); // e.g. `foo-preview.jpg`
+						final Path aspectTargetPath = appendFilenameBase(outputFile, FILENAME_ASPECT_DELIMITER + aspectId);
+						final UrfResourceDescription aspectDescription = loadArtifactDescription(context, sourceFile, aspectTargetPath); // load cached description using main image as source
+						aspectDescription.setPropertyValue(PROPERTY_TAG_MUMMY_ASPECT, aspectId);
+						return DefaultSourceFileArtifact.builder(this, aspectSourcePath, aspectTargetPath).setCorporealSourceFile(sourceFile)
+								.withDescription(aspectDescription).build(); //TODO set aspect ID
+					})));
+			return DefaultSourceFileArtifact.builder(this, sourceFile, outputFile).withDescription(description).withAspectArtifacts(aspectArtifacts).build();
 		}
 		return super.createArtifact(context, sourceFile, outputFile, description);
 	}
@@ -168,7 +185,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	/// @see AspectualArtifact#PROPERTY_TAG_MUMMY_ASPECT
 	protected void processImage(@NonNull final MummyContext context, @NonNull Artifact artifact, final InputStream inputStream, final OutputStream outputStream,
 			final boolean keepMetadata) throws IOException {
-		final Optional<String> foundAspect = artifact.getResourceDescription().findPropertyValue(AspectualArtifact.PROPERTY_TAG_MUMMY_ASPECT).map(Object::toString);
+		final Optional<String> foundAspect = artifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ASPECT).map(Object::toString);
 		//determine the correct configuration keys based upon the aspect, if any
 		final String configKeyScaleMaxLength = foundAspect.map(aspect -> CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH.formatted(aspect))
 				.orElse(CONFIG_KEY_MUMMY_IMAGE_SCALE_MAX_LENGTH);

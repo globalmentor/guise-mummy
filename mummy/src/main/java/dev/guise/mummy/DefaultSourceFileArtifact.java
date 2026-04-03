@@ -19,7 +19,6 @@ package dev.guise.mummy;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Conditions.*;
 import static java.nio.file.Files.*;
-import static java.util.Arrays.*;
 import static java.util.Objects.*;
 
 import java.io.*;
@@ -121,35 +120,31 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 			return self();
 		}
 
-		private Set<String> aspectIds = null;
+		private Map<String, Artifact> aspectArtifacts = null;
 
-		/// Indicates that an aspectual artifact should be created with the identified aspects.
-		/// @implSpec This implementation delegates to [#withAspects(Collection)].
-		/// @param aspectIds The IDs of the aspects that should be added.
-		/// @return This builder.
-		/// @throws IllegalStateException if this method is called twice on a builder.
-		/// @see AspectualArtifact
-		public B withAspects(@NonNull String... aspectIds) {
-			return withAspects(asList(aspectIds));
+		/// Returns the aspect artifacts, if any.
+		/// @return The aspect artifacts mapped by aspect ID, or `null` if not set.
+		Map<String, Artifact> getAspectArtifacts() {
+			return aspectArtifacts;
 		}
 
-		/// Indicates that an aspectual artifact should be created with the identified aspects.
-		/// @param aspectIds The IDs of the aspects that should be added.
+		/// Indicates that an aspectual artifact should be created with the given pre-built aspect artifacts.
+		/// @param aspectArtifacts The pre-built aspect artifacts mapped by aspect ID.
 		/// @return This builder.
 		/// @throws IllegalStateException if this method is called twice on a builder.
 		/// @see AspectualArtifact
-		public B withAspects(@NonNull Collection<String> aspectIds) {
-			checkState(this.aspectIds == null, "Aspects already set.");
-			this.aspectIds = Set.copyOf(aspectIds);
+		public B withAspectArtifacts(@NonNull final Map<String, Artifact> aspectArtifacts) {
+			checkState(this.aspectArtifacts == null, "Aspect artifacts already set.");
+			this.aspectArtifacts = Map.copyOf(aspectArtifacts);
 			return self();
 		}
 
-		/// {@inheritDoc} This implementation creates an [DefaultAspectualSourceFileArtifact] if a non-zero number of aspects are indicated; otherwise it
+		/// {@inheritDoc} This implementation creates a [DefaultAspectualSourceFileArtifact] if aspect artifacts are present; otherwise it
 		/// creates a [DefaultSourceFileArtifact].
 		@Override
 		public DefaultSourceFileArtifact build() {
 			validate();
-			return aspectIds != null && !aspectIds.isEmpty() ? new DefaultAspectualSourceFileArtifact(this, aspectIds) : new DefaultSourceFileArtifact(this);
+			return aspectArtifacts != null && !aspectArtifacts.isEmpty() ? new DefaultAspectualSourceFileArtifact(this) : new DefaultSourceFileArtifact(this);
 		}
 
 	}
