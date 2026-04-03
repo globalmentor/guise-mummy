@@ -67,9 +67,27 @@ public interface Mummifier extends Clogged {
 	public String planArtifactTargetFilename(@NonNull MummyContext context, @NonNull String filename);
 
 	/// Mummifies a resource in the presence of a context artifact, which may or may not be the same as the artifact itself.
+	/// @implSpec The default implementation delegates to [#mummify(MummyContext, Artifact, boolean)] with `invariably` set to `false`.
 	/// @param context The context of static site generation.
-	/// @param artifact The artifact being generated
+	/// @param artifact The artifact being generated.
 	/// @throws IOException if there is an I/O error during static site generation.
-	public void mummify(@NonNull final MummyContext context, @NonNull Artifact artifact) throws IOException;
+	public default void mummify(@NonNull final MummyContext context, @NonNull Artifact artifact) throws IOException {
+		mummify(context, artifact, false);
+	}
+
+	/// Mummifies a resource in the presence of a context artifact, which may or may not be the same as the artifact itself.
+	/// Mummification is invariably performed if `invariably` is `true`, regardless of whether
+	/// [MummyContext#isIncremental()] is enabled. If `invariably` is `false`, the mummifier may still perform
+	/// mummification unconditionally or incrementally according to its own implementation and the context; this
+	/// parameter only guarantees mummification when set to `true`, and does not imply incremental behavior when
+	/// set to `false`.
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact being generated.
+	/// @param invariably `true` if mummification must invariably be performed regardless of incremental
+	///        optimizations, propagating to any comprised artifacts; or `false` for normal behavior as determined
+	///        by the mummifier and context.
+	/// @throws IOException if there is an I/O error during static site generation.
+	/// @see MummyContext#isIncremental()
+	public void mummify(@NonNull final MummyContext context, @NonNull Artifact artifact, boolean invariably) throws IOException;
 
 }
