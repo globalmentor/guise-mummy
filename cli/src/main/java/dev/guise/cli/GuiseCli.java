@@ -392,7 +392,7 @@ public class GuiseCli extends BaseCliApplication {
 
 		tomcat.start(); //start the server
 
-		final URI siteLocalUrl = URIs.createURI(HTTP_URI_SCHEME, null, Host.LOCALHOST.getName(), port, ROOT_PATH, null, null);
+		final URI siteLocalUrl = URIs.createURI(HTTP_URI_SCHEME, null, Host.LOCALHOST.name(), port, ROOT_PATH, null, null);
 		getLogger().info("Serving site at <{}>. (Press Ctrl+C to stop.)", siteLocalUrl);
 
 		//launch the browser; see https://stackoverflow.com/a/5226244/421049

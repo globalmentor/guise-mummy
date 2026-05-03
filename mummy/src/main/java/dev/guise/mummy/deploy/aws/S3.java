@@ -20,6 +20,7 @@ import static com.globalmentor.collections.Sets.*;
 import static com.globalmentor.collections.iterables.Iterables.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.net.DnsName.*;
 import static dev.guise.mummy.GuiseMummy.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -269,7 +270,7 @@ public class S3 implements DeployTarget, Clogged {
 	protected static String getConfiguredBucket(@NonNull final Configuration globalConfiguration, @NonNull final Configuration localConfiguration)
 			throws ConfigurationException {
 		return localConfiguration.findString(CONFIG_KEY_BUCKET)
-				.or(() -> findConfiguredSiteDomain(globalConfiguration).map(DomainName.ROOT::relativize).map(DomainName::toString))
+				.or(() -> findConfiguredSiteDomain(globalConfiguration).flatMap(ROOT::relativize).map(DomainName::toString))
 				.orElseThrow(() -> new ConfigurationException("No configured S3 bucket could be determined."));
 	}
 

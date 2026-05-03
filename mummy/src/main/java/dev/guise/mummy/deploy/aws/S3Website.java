@@ -26,6 +26,7 @@ import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.Stream.*;
+import static com.globalmentor.net.DnsName.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
@@ -246,7 +247,7 @@ public class S3Website extends S3 {
 		super(profile, region, bucket);
 		this.altBuckets = new LinkedHashSet<>(altBuckets); //maintain order to help with reporting and debugging
 		if(siteDomain != null) {
-			siteDomain.checkArgumentAbsolute();
+			checkArgumentAbsolute(siteDomain);
 		}
 		this.siteDomain = siteDomain;
 		this.redirectMeans = requireNonNull(redirectMeans);
@@ -283,7 +284,7 @@ public class S3Website extends S3 {
 			@NonNull final Configuration localConfiguration) {
 		return localConfiguration.findCollection(CONFIG_KEY_ALT_BUCKETS, String.class)
 				.or(() -> findConfiguredSiteAltDomains(globalConfiguration)
-						.map(altDomains -> altDomains.stream().map(DomainName.ROOT::relativize).map(DomainName::toString).collect(toCollection(LinkedHashSet::new))))
+							.map(altDomains -> altDomains.stream().flatMap(dn -> ROOT.relativize(dn).stream()).map(DomainName::toString).collect(toCollection(LinkedHashSet::new))))
 				.orElse(emptyList());
 	}
 
@@ -353,7 +354,7 @@ public class S3Website extends S3 {
 			if(!routingRuleRedirectObjects.isEmpty()) {
 				getLogger().info("Configuring {} redirect routing rule(s).", routingRuleRedirectObjects.size());
 			}
-			final Optional<String> foundSiteHostName = getSiteDomain().map(DomainName.ROOT::relativize).map(DomainName::toString);
+			final Optional<String> foundSiteHostName = getSiteDomain().flatMap(ROOT::relativize).map(DomainName::toString);
 			//we support HTTPS either this deploy target (S3 websites usually don't) or one of our content delivery targets (e.g. CloudFront usually does) supports HTTPS
 			final boolean isHttpsSupported = concat(Stream.of(this), contentDeliveryTargets(context))
 					.filter(deployTarget -> deployTarget.getSupportedProtocols().contains(HTTPS_URI_SCHEME)).findAny().isPresent();

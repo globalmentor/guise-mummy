@@ -16,6 +16,7 @@
 
 package dev.guise.mummy.deploy;
 
+import static com.globalmentor.net.DnsName.*;
 import static dev.guise.mummy.GuiseMummy.*;
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
@@ -78,112 +79,112 @@ public interface Dns extends DeployTarget {
 
 	/// Sets a resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already exists
 	/// with the same type and name, it will be replaced. (This is commonly referred to as _upsert_.)
-	/// @implSpec The default implementation delegates to [#setResourceRecords(ResourceRecord.Type, DomainName, Stream, long)].
-	/// @implNote Implementations should normally only override [#setResourceRecords(String, DomainName, Stream, long)].
+	/// @implSpec The default implementation delegates to [#setResourceRecords(ResourceRecord.Type, DnsName, Stream, long)].
+	/// @implNote Implementations should normally only override [#setResourceRecords(String, DnsName, Stream, long)].
 	/// @param type The type of resource record to set.
-	/// @param name The fully-qualified domain name of the resource record.
+	/// @param name The fully-qualified DNS name of the resource record.
 	/// @param value The value to store in the resource record.
 	/// @param ttl The resource record cache time to live, in seconds.
 	/// @throws IllegalArgumentException if the given name is not absolute.
 	/// @throws IllegalArgumentException if the given TTL is negative.
 	/// @throws IOException If there was an error setting the resource record.
-	public default void setResourceRecord(final ResourceRecord.Type type, @NonNull final DomainName name, @NonNull final String value,
-			final long ttl) throws IOException {
+	public default void setResourceRecord(final ResourceRecord.Type type, @NonNull final DnsName name, @NonNull final String value, final long ttl)
+			throws IOException {
 		setResourceRecords(type, name, Stream.of(value), ttl);
 	}
 
 	/// Sets a resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already exists
 	/// with the same type and name, it will be replaced. (This is commonly referred to as _upsert_.)
-	/// @apiNote Use [#setResourceRecord(ResourceRecord.Type, DomainName, String, long)] for known resource record types is preferred for type and value
+	/// @apiNote Use [#setResourceRecord(ResourceRecord.Type, DnsName, String, long)] for known resource record types is preferred for type and value
 	///          safety.
-	/// @implSpec The default implementation delegates to [#setResourceRecords(String, DomainName, Stream, long)].
-	/// @implNote Implementations should normally only override [#setResourceRecords(String, DomainName, Stream, long)].
+	/// @implSpec The default implementation delegates to [#setResourceRecords(String, DnsName, Stream, long)].
+	/// @implNote Implementations should normally only override [#setResourceRecords(String, DnsName, Stream, long)].
 	/// @param type The type of resource record to set.
-	/// @param name The fully-qualified domain name of the resource record.
+	/// @param name The fully-qualified DNS name of the resource record.
 	/// @param value The value to store in the resource record.
 	/// @param ttl The resource record cache time to live, in seconds.
 	/// @throws IllegalArgumentException if the given name is not absolute.
 	/// @throws IllegalArgumentException if the given TTL is negative.
 	/// @throws IOException If there was an error setting the resource record.
-	public default void setResourceRecord(@NonNull final String type, @NonNull final DomainName name, @NonNull final String value, final long ttl)
+	public default void setResourceRecord(@NonNull final String type, @NonNull final DnsName name, @NonNull final String value, final long ttl)
 			throws IOException {
 		setResourceRecords(type, name, Stream.of(value), ttl);
 	}
 
 	/// Sets potentially several resource records with the given type and name, removing all other resource records with the same type and name.
-	/// @implSpec The default implementation delegates to [#setResourceRecords(ResourceRecord.Type, DomainName, Stream, long)].
-	/// @implNote Implementations should normally only override [#setResourceRecords(String, DomainName, Stream, long)].
+	/// @implSpec The default implementation delegates to [#setResourceRecords(ResourceRecord.Type, DnsName, Stream, long)].
+	/// @implNote Implementations should normally only override [#setResourceRecords(String, DnsName, Stream, long)].
 	/// @param type The type of resource record to set.
-	/// @param name The fully-qualified domain name of the resource record.
+	/// @param name The fully-qualified DNS name of the resource record.
 	/// @param values The values to store in the resource records; there must be at least one value.
 	/// @param ttl The resource record cache time to live, in seconds.
 	/// @throws IllegalArgumentException if the given name is not absolute.
 	/// @throws IllegalArgumentException if no values are given.
 	/// @throws IllegalArgumentException if the given TTL is negative.
 	/// @throws IOException If there was an error setting the resource record values.
-	public default void setResourceRecords(final ResourceRecord.Type type, @NonNull final DomainName name, @NonNull final Collection<String> values,
-			final long ttl) throws IOException {
+	public default void setResourceRecords(final ResourceRecord.Type type, @NonNull final DnsName name, @NonNull final Collection<String> values, final long ttl)
+			throws IOException {
 		setResourceRecords(type, name, values.stream(), ttl);
 	}
 
 	/// Sets potentially several resource records with the given type and name, removing all other resource records with the same type and name.
-	/// @implSpec The default implementation delegates to [#setResourceRecords(String, DomainName, Stream, long)].
-	/// @implNote Implementations should normally only override [#setResourceRecords(String, DomainName, Stream, long)].
+	/// @implSpec The default implementation delegates to [#setResourceRecords(String, DnsName, Stream, long)].
+	/// @implNote Implementations should normally only override [#setResourceRecords(String, DnsName, Stream, long)].
 	/// @param type The type of resource record to set.
-	/// @param name The fully-qualified domain name of the resource record.
+	/// @param name The fully-qualified DNS name of the resource record.
 	/// @param values The values to store in the resource records; there must be at least one value.
 	/// @param ttl The resource record cache time to live, in seconds.
 	/// @throws IllegalArgumentException if the given name is not absolute.
 	/// @throws IllegalArgumentException if no values are given.
 	/// @throws IllegalArgumentException if the given TTL is negative.
 	/// @throws IOException If there was an error setting the resource record values.
-	public default void setResourceRecords(final ResourceRecord.Type type, @NonNull final DomainName name, @NonNull final Stream<String> values,
-			final long ttl) throws IOException {
+	public default void setResourceRecords(final ResourceRecord.Type type, @NonNull final DnsName name, @NonNull final Stream<String> values, final long ttl)
+			throws IOException {
 		setResourceRecords(type.name(), name, values, ttl);
 	}
 
 	/// Sets potentially several resource records with the given type and name, removing all other resource records with the same type and name.
-	/// @implSpec The default implementation delegates to [#setResourceRecords(String, DomainName, Stream, long)].
-	/// @implNote Implementations should normally only override [#setResourceRecords(String, DomainName, Stream, long)].
+	/// @implSpec The default implementation delegates to [#setResourceRecords(String, DnsName, Stream, long)].
+	/// @implNote Implementations should normally only override [#setResourceRecords(String, DnsName, Stream, long)].
 	/// @param type The type of resource record to set.
-	/// @param name The fully-qualified domain name of the resource record.
+	/// @param name The fully-qualified DNS name of the resource record.
 	/// @param values The values to store in the resource records; there must be at least one value.
 	/// @param ttl The resource record cache time to live, in seconds.
 	/// @throws IllegalArgumentException if the given name is not absolute.
 	/// @throws IllegalArgumentException if no values are given.
 	/// @throws IllegalArgumentException if the given TTL is negative.
 	/// @throws IOException If there was an error setting the resource record values.
-	public default void setResourceRecords(@NonNull final String type, @NonNull final DomainName name, @NonNull final Collection<String> values,
-			final long ttl) throws IOException {
+	public default void setResourceRecords(@NonNull final String type, @NonNull final DnsName name, @NonNull final Collection<String> values, final long ttl)
+			throws IOException {
 		setResourceRecords(type, name, values.stream(), ttl);
 	}
 
 	/// Sets potentially several resource records with the given type and name, removing all other resource records with the same type and name.
-	/// @apiNote Use [#setResourceRecords(ResourceRecord.Type, DomainName, Stream, long)] for known resource record types is preferred for type and value
+	/// @apiNote Use [#setResourceRecords(ResourceRecord.Type, DnsName, Stream, long)] for known resource record types is preferred for type and value
 	///          safety.
 	/// @param type The type of resource record to set.
-	/// @param name The fully-qualified domain name of the resource record.
+	/// @param name The fully-qualified DNS name of the resource record.
 	/// @param values The values to store in the resource records; there must be at least one value.
 	/// @param ttl The resource record cache time to live, in seconds.
 	/// @throws IllegalArgumentException if the given name is not absolute.
 	/// @throws IllegalArgumentException if no values are given.
 	/// @throws IllegalArgumentException if the given TTL is negative.
 	/// @throws IOException If there was an error setting the resource record values.
-	public void setResourceRecords(@NonNull final String type, @NonNull final DomainName name, @NonNull final Stream<String> values, final long ttl)
+	public void setResourceRecords(@NonNull final String type, @NonNull final DnsName name, @NonNull final Stream<String> values, final long ttl)
 			throws IOException;
 
 	/// Sets a resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already exists
 	/// with the same type and name, it will be replaced. (This is commonly referred to as _upsert_.)
 	///
 	/// Resource record names will be resolved against the origin domain name, if any. [#DEFAULT_TTL] will be used if no TTL is indicated.
-	/// @implSpec The default implementation delegates to [#setResourceRecord(String, DomainName, String, long)].
+	/// @implSpec The default implementation delegates to [#setResourceRecord(String, DnsName, String, long)].
 	/// @param resourceRecord The resource record to set.
 	/// @throws IOException If there was an error setting the resource record.
 	/// @see #getOrigin()
 	/// @see #DEFAULT_TTL
 	public default void setResourceRecord(@NonNull final ResourceRecord resourceRecord) throws IOException {
 		final DomainName origin = getOrigin();
-		final DomainName name = origin.resolve(resourceRecord.getName().orElse(DomainName.EMPTY));
+		final DnsName name = resourceRecord.getName().map(origin::resolve).orElse(origin);
 		final long ttl = resourceRecord.getTtl().orElse(DEFAULT_TTL);
 		setResourceRecord(resourceRecord.getType(), name, resourceRecord.getValue(), ttl);
 	}
@@ -211,14 +212,14 @@ public interface Dns extends DeployTarget {
 	/// the combined record will have a TTL value.
 	/// @param resourceRecords The resource records to set.
 	/// @implSpec The default implementation groups together the values of records with the same type and resolved name and delegates to
-	///           [#setResourceRecords(String, DomainName, Stream, long)].
+	///           [#setResourceRecords(String, DnsName, Stream, long)].
 	/// @throws IOException If there was an error setting a resource record.
 	/// @see #getOrigin()
 	/// @see #DEFAULT_TTL
 	public default void setResourceRecords(@NonNull final Stream<ResourceRecord> resourceRecords) throws IOException {
 		final DomainName origin = getOrigin();
 		resourceRecords //group by type+name
-				.collect(groupingBy(resourceRecord -> Map.entry(resourceRecord.getType(), origin.resolve(resourceRecord.getName().orElse(DomainName.EMPTY)))))
+				.collect(groupingBy(resourceRecord -> Map.entry(resourceRecord.getType(), resourceRecord.getName().map(origin::resolve).orElse(origin))))
 				.forEach(throwingBiConsumer((key, resourceRecordGroup) -> {
 					assert !resourceRecordGroup.isEmpty() : "Grouping should not have produced an empty group.";
 					setResourceRecords(key.getKey(), key.getValue(), resourceRecordGroup.stream().map(ResourceRecord::getValue),
@@ -246,13 +247,17 @@ public interface Dns extends DeployTarget {
 	static DomainName getConfiguredOrigin(@NonNull final Configuration globalConfiguration, @NonNull final Configuration localConfiguration)
 			throws ConfigurationException {
 		//local hosted zone designation
-		return localConfiguration.findString(CONFIG_KEY_ORIGIN).map(DomainName::of).map(hostedZoneName -> {
-			if(!hostedZoneName.isAbsolute() || hostedZoneName.isRoot()) {
-				throw new ConfigurationException(
-						"The DNS zone `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character.".formatted(
-								CONFIG_KEY_ORIGIN, hostedZoneName, DomainName.DELIMITER)); //TODO i18n
+		return localConfiguration.findString(CONFIG_KEY_ORIGIN).map(text -> {
+			try {
+				final DomainName hostedZoneName = DomainName.parse(text);
+				if(!hostedZoneName.isAbsolute()) {
+					throw new ConfigurationException("The DNS zone `%s` configuration `%s` must be a fully-qualified domain name (FQDN), ending in a dot `%s` character."
+							.formatted(CONFIG_KEY_ORIGIN, hostedZoneName, DELIMITER)); //TODO i18n
+				}
+				return hostedZoneName;
+			} catch(final IllegalArgumentException illegalArgumentException) {
+				throw new ConfigurationException("Invalid DNS zone `%s` configuration `%s`.".formatted(CONFIG_KEY_ORIGIN, text), illegalArgumentException);
 			}
-			return hostedZoneName;
 		})
 				//fall back to global site domain configuration
 				.or(() -> findConfiguredDomain(globalConfiguration))
@@ -260,8 +265,8 @@ public interface Dns extends DeployTarget {
 				.or(() -> {
 					final List<DomainName> domains = Stream
 							.concat(findConfiguredSiteDomain(globalConfiguration).stream(), findConfiguredSiteAltDomains(globalConfiguration).orElse(emptyList()).stream())
-						.toList();
-					return DomainName.findGreatestCommonBase(domains);
+							.toList();
+					return DnsName.findGreatestCommonBase(domains);
 				}).orElseThrow(() -> new ConfigurationException("No origin domain could be determined for DNS zone."));
 	}
 
@@ -281,7 +286,7 @@ public interface Dns extends DeployTarget {
 			return records.stream().map(record -> {
 				try {
 					final String type = record.getString(RECORD_CONFIG_KEY_TYPE);
-					final DomainName name = record.findString(RECORD_CONFIG_KEY_NAME).map(DomainName::of).orElse(null);
+					final DnsName name = record.findString(RECORD_CONFIG_KEY_NAME).map(DnsName::parse).orElse(null);
 					final String value = ResourceRecord.decodeCharactString(record.getString(RECORD_CONFIG_KEY_VALUE));
 					//normalize the configured value if possible for recognized resource record types
 					final String normalizedValue = Enums.asEnum(ResourceRecord.Type.class, type).map(resourceRecordType -> {

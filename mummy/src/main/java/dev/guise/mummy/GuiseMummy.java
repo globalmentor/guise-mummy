@@ -127,12 +127,17 @@ public class GuiseMummy implements Clogged {
 	/// @see #CONFIG_KEY_DOMAIN
 	/// @throws ConfigurationException if the domain is not absolute.
 	public static Optional<DomainName> findConfiguredDomain(@NonNull final Configuration configuration) throws ConfigurationException {
-		return configuration.findString(CONFIG_KEY_DOMAIN).map(DomainName::of).map(domain -> {
-			if(!domain.isAbsolute() || domain.isRoot()) {
-				throw new ConfigurationException("The `%s` configuration `%s` must be a fully-qualified, non-root domain, ending in a dot `%s` character.".formatted(
-						CONFIG_KEY_DOMAIN, domain, DomainName.DELIMITER)); //TODO i18n
+		return configuration.findString(CONFIG_KEY_DOMAIN).map(text -> {
+			try {
+				final DomainName domain = DomainName.parse(text);
+				if(!domain.isAbsolute()) {
+					throw new ConfigurationException("The `%s` configuration `%s` must be a fully-qualified domain, ending in a dot `%s` character.".formatted(
+							CONFIG_KEY_DOMAIN, domain, DomainName.DELIMITER)); //TODO i18n
+				}
+				return domain;
+			} catch(final IllegalArgumentException illegalArgumentException) {
+				throw new ConfigurationException("Invalid `%s` configuration `%s`.".formatted(CONFIG_KEY_DOMAIN, text), illegalArgumentException);
 			}
-			return domain;
 		});
 	}
 
@@ -150,11 +155,18 @@ public class GuiseMummy implements Clogged {
 	/// @throws ConfigurationException if the site domain cannot be resolved to absolute form.
 	public static Optional<DomainName> findConfiguredSiteDomain(@NonNull final Configuration configuration) throws ConfigurationException {
 		final Optional<DomainName> configuredDomain = findConfiguredDomain(configuration);
-		final DomainName base = configuredDomain.orElse(DomainName.EMPTY);
-		return configuration.findString(CONFIG_KEY_SITE_DOMAIN).map(DomainName::of).map(base::resolve).or(() -> configuredDomain).map(siteDomain -> {
-			if(!siteDomain.isAbsolute() || siteDomain.isRoot()) {
+		return configuration.findString(CONFIG_KEY_SITE_DOMAIN).map(text -> {
+			try {
+				return configuredDomain
+						.map(base -> DomainName.parseReference(text, base)) // supports `""` as identity reference (resolves to base)
+						.orElseGet(() -> DomainName.parse(text)); // no base: `""` is correctly rejected
+			} catch(final IllegalArgumentException illegalArgumentException) {
+				throw new ConfigurationException("Invalid `%s` configuration `%s`.".formatted(CONFIG_KEY_SITE_DOMAIN, text), illegalArgumentException);
+			}
+		}).or(() -> configuredDomain).map(siteDomain -> {
+			if(!siteDomain.isAbsolute()) {
 				throw new ConfigurationException(
-						("The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN."
+						("The `%s` configuration `%s` must be a fully-qualified domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN."
 						).formatted(CONFIG_KEY_SITE_DOMAIN, siteDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN));
 			}
 			return siteDomain;
@@ -171,16 +183,24 @@ public class GuiseMummy implements Clogged {
 	/// @see #CONFIG_KEY_SITE_ALT_DOMAINS
 	/// @throws ConfigurationException if one of the site alternate domains cannot be resolved to absolute form.
 	public static Optional<Collection<DomainName>> findConfiguredSiteAltDomains(@NonNull final Configuration configuration) {
-		final DomainName base = findConfiguredDomain(configuration).orElse(DomainName.EMPTY);
+		final Optional<DomainName> configuredDomain = findConfiguredDomain(configuration);
 		return configuration.findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)
-				.map(names -> names.stream().map(DomainName::of).map(base::resolve).map(siteAltDomain -> {
-					if(!siteAltDomain.isAbsolute() || siteAltDomain.isRoot()) {
-						throw new ConfigurationException(
-								("The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN."
-								).formatted(CONFIG_KEY_SITE_ALT_DOMAINS, siteAltDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN)); //TODO i18n
+				.map(names -> names.stream().map(text -> {
+					try {
+						return configuredDomain
+								.map(base -> DomainName.parseReference(text, base)) // supports `""` as identity reference (resolves to base)
+								.orElseGet(() -> DomainName.parse(text)); // no base: `""` is correctly rejected
+					} catch(final IllegalArgumentException illegalArgumentException) {
+						throw new ConfigurationException("Invalid `%s` configuration `%s`.".formatted(CONFIG_KEY_SITE_ALT_DOMAINS, text), illegalArgumentException);
 					}
-					return siteAltDomain;
-				}).collect(toCollection(LinkedHashSet::new)));
+				}).map(siteAltDomain -> {
+				if(!siteAltDomain.isAbsolute()) {
+					throw new ConfigurationException(
+							("The `%s` configuration `%s` must be a fully-qualified domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN."
+							).formatted(CONFIG_KEY_SITE_ALT_DOMAINS, siteAltDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN)); //TODO i18n
+				}
+				return siteAltDomain;
+			}).collect(toCollection(LinkedHashSet::new)));
 	}
 
 	//## mummy configuration

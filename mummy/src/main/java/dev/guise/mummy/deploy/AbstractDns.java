@@ -26,6 +26,8 @@ import org.slf4j.Logger;
 
 import com.globalmentor.net.*;
 
+import static com.globalmentor.net.DnsName.*;
+
 import io.clogr.Clogged;
 import dev.guise.mummy.*;
 
@@ -61,7 +63,7 @@ public abstract class AbstractDns implements Dns, Clogged {
 	/// @param resourceRecords The resource records to be created during deployment; may be empty.
 	/// @throws IllegalArgumentException if the given origin is not absolute.
 	public AbstractDns(@NonNull final DomainName origin, @NonNull final Collection<ResourceRecord> resourceRecords) {
-		this.origin = origin.checkArgumentAbsolute();
+		this.origin = checkArgumentAbsolute(origin);
 		this.resourceRecords = List.copyOf(resourceRecords);
 	}
 
@@ -71,9 +73,11 @@ public abstract class AbstractDns implements Dns, Clogged {
 	@Override
 	public Optional<URI> deploy(final MummyContext context, final Artifact rootArtifact) throws IOException {
 		final Logger logger = getLogger();
+		final DomainName origin = getOrigin();
 		for(final ResourceRecord resourceRecord : getResourceRecords()) {
-			logger.info("Deploying DNS resource record [{}] `{}` = `{}` ({}).", resourceRecord.getType(),
-					getOrigin().resolve(resourceRecord.getName().orElse(DomainName.EMPTY)), resourceRecord.getValue(), resourceRecord.getTtl().orElse(DEFAULT_TTL));
+			final DnsName recordName = resourceRecord.getName().map(origin::resolve).orElse(origin);
+			logger.info("Deploying DNS resource record [{}] `{}` = `{}` ({}).", resourceRecord.getType(), recordName, resourceRecord.getValue(),
+					resourceRecord.getTtl().orElse(DEFAULT_TTL));
 		}
 		setResourceRecords(getResourceRecords());
 		return Optional.empty();

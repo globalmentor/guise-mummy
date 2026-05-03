@@ -40,7 +40,7 @@ public class DnsTest {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",
 				GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com.", "bar.example.com.")));
 		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Dns.CONFIG_KEY_ORIGIN, "example.net."));
-		assertThat(Dns.getConfiguredOrigin(globalConfiguration, localConfiguration), is(DomainName.of("example.net.")));
+		assertThat(Dns.getConfiguredOrigin(globalConfiguration, localConfiguration), is(DomainName.parse("example.net.")));
 	}
 
 	/// @see Dns#getConfiguredOrigin(Configuration, Configuration)
@@ -65,7 +65,7 @@ public class DnsTest {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "example.net.", GuiseMummy.CONFIG_KEY_SITE_DOMAIN,
 				"test.example.com.", GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com.", "bar.example.com.")));
 		final Configuration localConfiguration = Configuration.empty();
-		assertThat(Dns.getConfiguredOrigin(globalConfiguration, localConfiguration), is(DomainName.of("example.net.")));
+		assertThat(Dns.getConfiguredOrigin(globalConfiguration, localConfiguration), is(DomainName.parse("example.net.")));
 	}
 
 	/// @see Dns#getConfiguredOrigin(Configuration, Configuration)
@@ -74,7 +74,7 @@ public class DnsTest {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",
 				GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com.", "bar.example.com.")));
 		final Configuration localConfiguration = Configuration.empty();
-		assertThat(Dns.getConfiguredOrigin(globalConfiguration, localConfiguration), is(DomainName.of("example.com.")));
+		assertThat(Dns.getConfiguredOrigin(globalConfiguration, localConfiguration), is(DomainName.parse("example.com.")));
 	}
 
 }

@@ -37,6 +37,7 @@ import org.jspecify.annotations.*;
 import org.slf4j.Logger;
 
 import com.globalmentor.collections.Sets;
+import com.globalmentor.net.DnsName;
 import com.globalmentor.net.DomainName;
 import com.globalmentor.net.HTTP;
 import com.globalmentor.net.ResourceRecord;
@@ -271,7 +272,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 							context.getDeployDns().ifPresentOrElse(throwingConsumer(dns -> {
 								logger.info("Setting DNS entry [{}] `{}` = `{}` for certificate `{}` validation for domain name `{}`.", resourceRecord.typeAsString(),
 										resourceRecord.name(), resourceRecord.value(), certificateArn, domainValidation.domainName());
-								dns.setResourceRecord(resourceRecord.typeAsString(), DomainName.of(resourceRecord.name()), resourceRecord.value(),
+								dns.setResourceRecord(resourceRecord.typeAsString(), DnsName.parse(resourceRecord.name()), resourceRecord.value(),
 										CERTIFICATE_VALIDATION_DNS_TTL);
 							}), () -> logger.warn(
 									"No DNS configured. To validate certificate `{}` for domain name `{}`, resource record [{}] `{}` = `{}` must be set in the DNS manually.",
@@ -348,14 +349,14 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 							.comment(commentBuilder.toString()).build();
 					final Distribution distribution = cloudFrontClient.createDistribution(request -> request.distributionConfig(distributionConfig)).distribution();
 					distributionId = distribution.id();
-					distributionDomainName = DomainName.of(distribution.domainName());
+					distributionDomainName = DomainName.parse(distribution.domainName());
 				} else {
 					if(existingDistributionSummaries.size() > 1) {
 						throw new IOException("Multiple distributions found with an alias for bucket `%s`; all but one must be removed.".formatted(s3Bucket));
 					}
 					final DistributionSummary distributionSummary = getOnly(existingDistributionSummaries);
 					distributionId = distributionSummary.id();
-					distributionDomainName = DomainName.of(distributionSummary.domainName());
+					distributionDomainName = DomainName.parse(distributionSummary.domainName());
 					//TODO ensure that the existing distribution truly has the correct origin, i.e. to the S3 bucket
 
 					//Invalidate all the files in the existing distribution, so that any changes will take place immediately
@@ -373,7 +374,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 				}
 
 				//add an alias record to the new distribution if we have a Route 53 DNS
-				final DomainName domainName = DomainName.ROOT.resolve(DomainName.of(s3Bucket)); //the domain name is the S3 bucket (as a relative domain) resolved to `.`
+				final DomainName domainName = DomainName.parse(s3Bucket).resolveAgainstRoot(); //the domain name is the S3 bucket (as a relative domain) resolved to `.`
 				context.getDeployDns().filter(Route53.class::isInstance).map(Route53.class::cast).ifPresentOrElse(throwingConsumer(route53 -> {
 					logger.info("Setting DNS alias [A] record for domain name `{}` to CloudFront distribution `{}` domain `{}`.", domainName, distributionId,
 							distributionDomainName);

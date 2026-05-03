@@ -16,7 +16,6 @@
 
 package dev.guise.mummy.deploy.flange;
 
-import static com.globalmentor.net.DomainName.*;
 import static com.globalmentor.util.Optionals.*;
 import static dev.flange.platform.aws.FlangePlatformAws.Templates.Exports.*;
 import static dev.guise.mummy.GuiseMummy.*;
@@ -310,7 +309,13 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 		final var configuration = context.getConfiguration();
 		final var foundGuiseDomain = findConfiguredDomain(configuration);
 		foundGuiseDomain.ifPresent(guiseDomain -> {
-			final var foundFlangeDomain = flangeEnv.findOutput(DOMAIN_NAME).map(DomainName::of).map(ROOT::resolve);
+			final var foundFlangeDomain = flangeEnv.findOutput(DOMAIN_NAME).map(value -> {
+				try {
+					return DomainName.parse(value);
+				} catch(final IllegalArgumentException illegalArgumentException) {
+					throw new ConfiguredStateException("Invalid domain name `%s` in environment `%s`.".formatted(value, flangeEnv.name()), illegalArgumentException);
+				}
+			}).map(DomainName::resolveAgainstRoot);
 			if(!foundFlangeDomain.equals(foundGuiseDomain)) {
 				getLogger().atWarn().log("Project `{}` is `{}`, but Flange environment domain is{}.", CONFIG_KEY_DOMAIN, guiseDomain,
 						foundFlangeDomain.map(" `%s`"::formatted).orElse(" not configured"));
@@ -318,14 +323,21 @@ public class FlangeWebSite implements DeployTarget, Clogged {
 		});
 		final var foundGuiseSiteDomain = findConfiguredSiteDomain(configuration);
 		foundGuiseSiteDomain.ifPresent(guiseSiteDomain -> {
-			final var foundFlangeWebDomain = flangeEnv.findOutput(WEB_DOMAIN_NAME).map(DomainName::of).map(ROOT::resolve);
+			final var foundFlangeWebDomain = flangeEnv.findWebDomainName().map(DomainName::resolveAgainstRoot);
 			if(!foundFlangeWebDomain.equals(foundGuiseSiteDomain)) {
 				getLogger().atWarn().log("Project `{}` is `{}`, but Flange environment web domain is{}.", CONFIG_KEY_SITE_DOMAIN, guiseSiteDomain,
 						foundFlangeWebDomain.map(" `%s`"::formatted).orElse(" not configured"));
 			}
 		});
 		findConfiguredSiteAltDomains(configuration).ifPresent(guiseAltDomains -> { // Guise allows multiple; Flange supports one
-			final var foundFlangeAltWebDomain = flangeEnv.findOutput(ALT_WEB_DOMAIN_NAME).map(DomainName::of).map(ROOT::resolve);
+			final var foundFlangeAltWebDomain = flangeEnv.findOutput(ALT_WEB_DOMAIN_NAME).map(value -> {
+				try {
+					return DomainName.parse(value);
+				} catch(final IllegalArgumentException illegalArgumentException) {
+					throw new ConfiguredStateException("Invalid alt web domain name `%s` in environment `%s`.".formatted(value, flangeEnv.name()),
+							illegalArgumentException);
+				}
+			}).map(DomainName::resolveAgainstRoot);
 			if(!foundFlangeAltWebDomain.filter(guiseAltDomains::contains).isPresent()) { // absent or not among them
 				getLogger().atWarn().log("Project configures `{}` ({}), but Flange environment alt web domain is{}.", CONFIG_KEY_SITE_ALT_DOMAINS,
 						guiseAltDomains.stream().map("`%s`"::formatted).collect(joining(", ")),

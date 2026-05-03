@@ -48,7 +48,7 @@ public class GuiseMummyTest {
 	@Test
 	public void testFindConfiguredDomain() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "example.com."));
-		assertThat(GuiseMummy.findConfiguredDomain(configuration), isPresentAndIs(DomainName.of("example.com.")));
+		assertThat(GuiseMummy.findConfiguredDomain(configuration), isPresentAndIs(DomainName.parse("example.com.")));
 	}
 
 	/// @see GuiseMummy#findConfiguredDomain(Configuration)
@@ -78,7 +78,7 @@ public class GuiseMummyTest {
 	public void testFindConfiguredSiteDomain() {
 		final Configuration configuration = new ObjectMapConfiguration(
 				Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "example.com.", GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "www.example.com."));
-		assertThat(GuiseMummy.findConfiguredSiteDomain(configuration), isPresentAndIs(DomainName.of("www.example.com.")));
+		assertThat(GuiseMummy.findConfiguredSiteDomain(configuration), isPresentAndIs(DomainName.parse("www.example.com.")));
 	}
 
 	/// @see GuiseMummy#findConfiguredSiteDomain(Configuration)
@@ -86,14 +86,14 @@ public class GuiseMummyTest {
 	public void testFindConfiguredSiteDomainResolvesToDomain() {
 		final Configuration configuration = new ObjectMapConfiguration(
 				Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "example.com.", GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "www"));
-		assertThat(GuiseMummy.findConfiguredSiteDomain(configuration), isPresentAndIs(DomainName.of("www.example.com.")));
+		assertThat(GuiseMummy.findConfiguredSiteDomain(configuration), isPresentAndIs(DomainName.parse("www.example.com.")));
 	}
 
 	/// @see GuiseMummy#findConfiguredSiteDomain(Configuration)
 	@Test
 	public void testFindConfiguredSiteDomainDefaultsToDomain() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "www.example.com."));
-		assertThat(GuiseMummy.findConfiguredSiteDomain(configuration), isPresentAndIs(DomainName.of("www.example.com.")));
+		assertThat(GuiseMummy.findConfiguredSiteDomain(configuration), isPresentAndIs(DomainName.parse("www.example.com.")));
 	}
 
 	/// @see GuiseMummy#findConfiguredSiteDomain(Configuration)
@@ -110,6 +110,20 @@ public class GuiseMummyTest {
 		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredSiteDomain(configuration));
 	}
 
+	/// @see GuiseMummy#findConfiguredSiteDomain(Configuration)
+	@Test
+	public void testFindConfiguredSiteDomainEmptyResolvesToDomain() {
+		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "example.com.", GuiseMummy.CONFIG_KEY_SITE_DOMAIN, ""));
+		assertThat(GuiseMummy.findConfiguredSiteDomain(configuration), isPresentAndIs(DomainName.parse("example.com.")));
+	}
+
+	/// @see GuiseMummy#findConfiguredSiteDomain(Configuration)
+	@Test
+	public void testFindConfiguredSiteDomainEmptyWithoutBaseThrowsException() {
+		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, ""));
+		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredSiteDomain(configuration));
+	}
+
 	//## `site.altDomains`
 
 	/// @see GuiseMummy#findConfiguredSiteAltDomains(Configuration)
@@ -123,8 +137,9 @@ public class GuiseMummyTest {
 	public void testGetConfiguredSiteAltDomains() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS,
 				List.of("example.com.", "www.example.com.", "foo.example.com.", "bar.example.net.", "foo.bar.example.com.")));
-		assertThat(GuiseMummy.findConfiguredSiteAltDomains(configuration), isPresentAnd(containsInAnyOrder(DomainName.of("example.com."),
-				DomainName.of("www.example.com."), DomainName.of("foo.example.com."), DomainName.of("bar.example.net."), DomainName.of("foo.bar.example.com."))));
+		assertThat(GuiseMummy.findConfiguredSiteAltDomains(configuration),
+				isPresentAnd(containsInAnyOrder(DomainName.parse("example.com."), DomainName.parse("www.example.com."), DomainName.parse("foo.example.com."),
+						DomainName.parse("bar.example.net."), DomainName.parse("foo.bar.example.com."))));
 	}
 
 	/// @see GuiseMummy#findConfiguredSiteAltDomains(Configuration)
@@ -132,8 +147,16 @@ public class GuiseMummyTest {
 	public void testGetConfiguredSiteAltDomainsResolveToDomain() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "example.com.", GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS,
 				List.of("", "www", "foo.example.com.", "bar.example.net.", "foo.bar")));
-		assertThat(GuiseMummy.findConfiguredSiteAltDomains(configuration), isPresentAnd(containsInAnyOrder(DomainName.of("example.com."),
-				DomainName.of("www.example.com."), DomainName.of("foo.example.com."), DomainName.of("bar.example.net."), DomainName.of("foo.bar.example.com."))));
+		assertThat(GuiseMummy.findConfiguredSiteAltDomains(configuration),
+				isPresentAnd(containsInAnyOrder(DomainName.parse("example.com."), DomainName.parse("www.example.com."), DomainName.parse("foo.example.com."),
+						DomainName.parse("bar.example.net."), DomainName.parse("foo.bar.example.com."))));
+	}
+
+	/// @see GuiseMummy#findConfiguredSiteAltDomains(Configuration)
+	@Test
+	public void testGetConfiguredSiteAltDomainsEmptyWithoutBaseThrowsException() {
+		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("example.com.", "")));
+		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredSiteAltDomains(configuration));
 	}
 
 	/// @see GuiseMummy#findConfiguredSiteAltDomains(Configuration)
