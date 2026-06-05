@@ -31,6 +31,7 @@ import java.util.regex.*;
 import javax.xml.parsers.*;
 
 import org.snakeyaml.engine.v2.api.*;
+import org.snakeyaml.engine.v2.exceptions.YamlEngineException;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -56,8 +57,12 @@ import dev.guise.mummy.MummyContext;
 /// @author Garret Wilson
 public class MarkdownPageMummifier extends AbstractPageMummifier {
 
-	/// Pattern for a Markdown document with YAML front matter.
-	static final Pattern MARKDOWN_WITH_YAML_PATTERN = Pattern.compile("(?:---[\\r\\n]+(.*)---(?:[\\r\\n]+|$))?(.*)", Pattern.DOTALL);
+	/// Pattern for a Markdown document with YAML front matter. The opening `---` must appear at the very start of the document (enforced by
+	/// [java.util.regex.Matcher#matches()]) and be followed by exactly one line ending, after which the YAML content group begins on line 2.
+	/// The closing `---` must appear at the start of a line and may be followed only by spaces or tabs before the line ending. The YAML content
+	/// group captures its trailing newline (the newline immediately before the closing `---`).
+	static final Pattern MARKDOWN_WITH_YAML_PATTERN = Pattern.compile("(?:---(?:\\r\\n|[\\r\\n])(.*?)^---[ \\t]*(?:[\\r\\n]+|$))?(.*)",
+			Pattern.DOTALL | Pattern.MULTILINE);
 	/// The matching group for YAML content in a Markdown document with YAML. The value of the group will be `null` if no YAML is present.
 	static final int MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP = 1;
 	/// The matching group for Markdown content in a Markdown document with YAML. The value of the group may be the empty string but will never be
@@ -167,7 +172,12 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		if(yaml == null) { //no YAML front matter present
 			return emptyList();
 		}
-		final Object object = new Load(LoadSettings.builder().build()).loadFromString(yaml);
+		final Object object;
+		try {
+			object = new Load(LoadSettings.builder().build()).loadFromString("\n" + yaml); // prepend `\n` so SnakeYAML line numbers match the source document (depends on opener `---` being on line 1)
+		} catch(final YamlEngineException yamlEngineException) {
+			throw new IOException("Invalid YAML front matter in `%s`: %s".formatted(name, yamlEngineException.getLocalizedMessage()), yamlEngineException);
+		}
 		if(!(object instanceof Map<?, ?> yamlMap)) {
 			return emptyList();
 		}

@@ -27,6 +27,7 @@ import static java.nio.charset.StandardCharsets.*;
 import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.URI;
@@ -37,6 +38,7 @@ import java.util.regex.Matcher;
 
 import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
+import org.snakeyaml.engine.v2.exceptions.YamlEngineException;
 import org.w3c.dom.*;
 
 import io.confound.config.Configuration;
@@ -78,6 +80,7 @@ public class MarkdownPageMummifierTest {
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
 	}
 
+	/// Tests that an empty YAML front matter block (no content between the delimiters) is recognized and produces an empty YAML group.
 	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
 	@Test
 	public void testMarkdownWithYamlPatternEmptyYaml() {
@@ -85,6 +88,16 @@ public class MarkdownPageMummifierTest {
 		assertThat(matcher.matches(), is(true));
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is(""));
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
+	}
+
+	/// Tests that exactly one line ending after the opener is consumed; a blank line after `---` lands in the YAML content group.
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
+	@Test
+	public void testMarkdownWithYamlPatternSingleNewlineAfterOpenerConsumed() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\n\nfoo: bar\n---\nbody");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("\nfoo: bar\n"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("body"));
 	}
 
 	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
@@ -96,31 +109,94 @@ public class MarkdownPageMummifierTest {
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("---foo:bar---\n# Heading\n\nBody text."));
 	}
 
+	/// Tests that `---` not at the start of the document is not recognized as a front matter opener.
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
+	@Test
+	public void testMarkdownWithYamlPatternNotAtStartNotRecognized() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("Body text.\n---\nfoo: bar\n---\n");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is(nullValue()));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("Body text.\n---\nfoo: bar\n---\n"));
+	}
+
 	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
 	@Test
 	public void testMarkdownWithYamlPattern() {
-		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---\n# Heading\n\nBody text.");
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test\n---\n# Heading\n\nBody text.");
 		assertThat(matcher.matches(), is(true));
-		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test\n"));
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
 	}
 
 	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
 	@Test
 	public void testMarkdownWithYamlPatternNoMarkdown() {
-		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---");
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test\n---");
 		assertThat(matcher.matches(), is(true));
-		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test\n"));
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is(""));
 	}
 
 	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
 	@Test
 	public void testMarkdownWithYamlPatternEmptyLineMarkdown() {
-		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---\n");
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test\n---\n");
 		assertThat(matcher.matches(), is(true));
-		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test\n"));
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is(""));
+	}
+
+	/// Tests that `---` on its own line in the Markdown body does not confuse the front matter closer.
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
+	@Test
+	public void testMarkdownWithYamlPatternBodyDashesIgnored() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\ntitle: Test\n---\nBefore\n---\nAfter");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("title: Test\n"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("Before\n---\nAfter"));
+	}
+
+	/// Tests that `---` mid-line in the body (as in a `<pre><code>` block) does not match the front matter closer.
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
+	@Test
+	public void testMarkdownWithYamlPatternMidLineDashesIgnored() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\ntitle: Test\n---\nBody.\n<pre><code class=\"language-markdown\">---\n</code></pre>");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("title: Test\n"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("Body.\n<pre><code class=\"language-markdown\">---\n</code></pre>"));
+	}
+
+	/// Tests that the front matter closer tolerates trailing spaces and tabs.
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
+	@Test
+	public void testMarkdownWithYamlPatternCloserTrailingWhitespace() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\ntitle: Test\n--- \t \n# Heading\n");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("title: Test\n"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n"));
+	}
+
+	/// Tests that `---` with trailing non-whitespace is not recognized as a front matter closer.
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
+	@Test
+	public void testMarkdownWithYamlPatternCloserWithNonWhitespaceNotRecognized() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\ntitle: Test\n---extra\n# Heading\n");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is(nullValue()));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("---\ntitle: Test\n---extra\n# Heading\n"));
+	}
+
+	/// Tests that a YAML syntax error in front matter is wrapped as an [IOException]
+	/// with the original [YamlEngineException] preserved as the cause.
+	/// @see MarkdownPageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
+	@Test
+	public void testLoadSourceMetadataInvalidYamlWrapsException() throws IOException {
+		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
+		final String markdown = "---\nfoo: [unclosed\n---\n# Heading\n";
+		try (final InputStream inputStream = new ByteArrayInputStream(markdown.getBytes(UTF_8))) {
+			final IOException thrown = assertThrows(IOException.class, () -> mummifier.loadSourceMetadata(mummyContext, inputStream, "test.md"));
+			assertThat(thrown.getCause(), instanceOf(YamlEngineException.class));
+		}
 	}
 
 	/// Asserts that the body of the given document matches that expected for the "simple-" test files.
