@@ -27,6 +27,7 @@ import static java.nio.charset.StandardCharsets.*;
 import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.URI;
@@ -37,6 +38,7 @@ import java.util.regex.Matcher;
 
 import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
+import org.snakeyaml.engine.v2.exceptions.YamlEngineException;
 import org.w3c.dom.*;
 
 import io.confound.config.Configuration;
@@ -121,6 +123,19 @@ public class MarkdownPageMummifierTest {
 		assertThat(matcher.matches(), is(true));
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test"));
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is(""));
+	}
+
+	/// Tests that a YAML syntax error in front matter is wrapped as an [IOException]
+	/// with the original [YamlEngineException] preserved as the cause.
+	/// @see MarkdownPageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
+	@Test
+	public void testLoadSourceMetadataInvalidYamlWrapsException() throws IOException {
+		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
+		final String markdown = "---\nfoo: [unclosed\n---\n# Heading\n";
+		try (final InputStream inputStream = new ByteArrayInputStream(markdown.getBytes(UTF_8))) {
+			final IOException thrown = assertThrows(IOException.class, () -> mummifier.loadSourceMetadata(mummyContext, inputStream, "test.md"));
+			assertThat(thrown.getCause(), instanceOf(YamlEngineException.class));
+		}
 	}
 
 	/// Asserts that the body of the given document matches that expected for the "simple-" test files.

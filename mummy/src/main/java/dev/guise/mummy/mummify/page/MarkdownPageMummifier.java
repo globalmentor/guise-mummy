@@ -31,6 +31,7 @@ import java.util.regex.*;
 import javax.xml.parsers.*;
 
 import org.snakeyaml.engine.v2.api.*;
+import org.snakeyaml.engine.v2.exceptions.YamlEngineException;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -167,7 +168,15 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		if(yaml == null) { //no YAML front matter present
 			return emptyList();
 		}
-		final Object object = new Load(LoadSettings.builder().build()).loadFromString(yaml);
+		final int yamlLineOffset = (int)content.chars().limit(matcher.start(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP)).filter(c -> c == '\n').count(); // line count before YAML group TODO use improved `count()` method with `endIndex`
+		final Object object;
+		try {
+			// Prepend newlines so parser error line numbers match the source document.
+			// Whether the newlines match the rest of the YAML make no difference for parsing.
+			object = new Load(LoadSettings.builder().build()).loadFromString("\n".repeat(yamlLineOffset) + yaml);
+		} catch(final YamlEngineException yamlEngineException) {
+			throw new IOException("Invalid YAML front matter in `%s`: %s".formatted(name, yamlEngineException.getLocalizedMessage()), yamlEngineException);
+		}
 		if(!(object instanceof Map<?, ?> yamlMap)) {
 			return emptyList();
 		}
