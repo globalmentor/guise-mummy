@@ -300,6 +300,50 @@ public class MarkdownPageMummifierTest {
 		}
 	}
 
+	/// Asserts that parsing the given Markdown surfaces an element with the given local name in the XHTML namespace,
+	/// carrying a `foo:bar="sentinel"` attribute resolved in the namespace `https://example.com/ns/test/`.
+	/// @param markdown The Markdown source whose embedded HTML block declares the namespace.
+	/// @param elementLocalName The local name of the embedded element expected to carry the namespaced attribute.
+	/// @throws IOException if the Markdown cannot be parsed.
+	protected void assertEmbeddedHtmlNamespacePropagates(@NonNull final String markdown, @NonNull final String elementLocalName) throws IOException {
+		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
+		final Document document;
+		try (final InputStream inputStream = new ByteArrayInputStream(markdown.getBytes(UTF_8))) {
+			document = mummifier.loadSourceDocument(mummyContext, inputStream, "test.md");
+		}
+		final Element body = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element embedded = childElementsByNameNS(body, XHTML_NAMESPACE_URI_STRING, elementLocalName).findFirst().orElseThrow(AssertionError::new);
+		assertThat("namespaced attribute resolved in its namespace", embedded.hasAttributeNS("https://example.com/ns/test/", "bar"), is(true));
+		assertThat("namespaced attribute value", embedded.getAttributeNS("https://example.com/ns/test/", "bar"), is("sentinel"));
+	}
+
+	/// Tests that an XML namespace declared on a CommonMark type-6 HTML block (`<aside>`) embedded in Markdown
+	/// is resolved into the parsed DOM tree, making the namespaced attribute accessible via DOM namespace APIs.
+	/// @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream, String)
+	@Test
+	void testType6HtmlBlockNamespacePropagatesToDom() throws IOException {
+		assertEmbeddedHtmlNamespacePropagates("""
+				# Heading
+
+				<aside xmlns:foo="https://example.com/ns/test/" foo:bar="sentinel">content</aside>
+				""", ELEMENT_ASIDE);
+	}
+
+	/// Tests that an XML namespace declared on a CommonMark type-1 HTML block (`<pre>`, a raw-text element
+	/// whose close tag sits on a separate line with content in between) is resolved into the parsed DOM tree.
+	/// @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream, String)
+	@Test
+	void testType1HtmlBlockNamespacePropagatesToDom() throws IOException {
+		assertEmbeddedHtmlNamespacePropagates("""
+				# Heading
+
+				<pre xmlns:foo="https://example.com/ns/test/" foo:bar="sentinel">
+				first line
+				second line
+				</pre>
+				""", ELEMENT_PRE);
+	}
+
 	/// Tests whether typographic conversions are appropriately being made, such as converting "---" to em dash "—".
 	/// @implSpec Currently typographic conversions are disabled altogether because the Flexmark Typographic Extension seems to be dropping characters altogether
 	///           (e.g. the apostrophe). These tests will be updated and expanded if the Typographic Extension or something like it is re-enabled, but for now it

@@ -2,12 +2,12 @@
 
 ## Objective
 
-Guise Mesh supports a mechanism by which a DOM element and its entire subtree can be designated as exempt from all Mesh processing — expression interpolation, `mx:` attribute evaluation, and child-node recursion.
+Guise Mesh supports a mechanism by which the textual content of a DOM element and its subtree can be designated as literal — exempt from `^{…}` interpolation — so that authored content containing that syntax is passed through unchanged.
 
 ## Acceptance Criteria
 
-- A designated element is passed through by `GuiseMesh` without any expression interpolation or `mx:` attribute processing.
-- All descendant nodes of a designated element are likewise unprocessed.
+- Character data within a designated element is not scanned for `^{…}` interpolation expressions; the content is passed through verbatim.
+- The designation is inherited by descendant content, covering the entire subtree without per-element annotation.
 - The feature is implemented within `GuiseMesh` as a first-class Mesh capability, not as a workaround in the Guise Mummy caller layer.
 - All existing Mesh behavior for elements that are not so designated is unchanged.
 
@@ -19,7 +19,6 @@ Guise Mummy applies Mesh after the full page document has been assembled (includ
 
 ## Constraints
 
-- The bypass must cover the entire Mesh processing pipeline for the designated element and its descendants, not only text interpolation.
 - The implementation must reside in `GuiseMesh` (or an appropriate Mesh-layer class), not in the Guise Mummy caller.
 
 ## Orientation
