@@ -4,7 +4,7 @@
 
 This plan is monolithic; the work is a focused addition of namespace-propagation tests to `MarkdownPageMummifierTest`. It verifies that an XML namespace declared on an HTML element embedded in Markdown — a CommonMark HTML block — passes through the Flexmark → `DocumentBuilder` pipeline as a true XML namespace, accessible via DOM namespace APIs, across the CommonMark HTML block types that yield namespaced elements.
 
-The tests mitigate a risk identified in the [GUISE-233] literal-content-mode plan: `mx:content-mode` is useful in Markdown sources precisely because authors can embed `mx:`-attributed HTML blocks; the namespace propagation behavior that makes this possible has no test coverage. If it silently does not work, the Mesh feature lands correctly but the motivating use case fails.
+The tests mitigate a risk identified in the [GUISE-233] literal-content-as plan: `mx:content-as` is useful in Markdown sources precisely because authors can embed `mx:`-attributed HTML blocks; the namespace propagation behavior that makes this possible has no test coverage. If it silently does not work, the Mesh feature lands correctly but the motivating use case fails.
 
 - Step 1: Add namespace propagation tests for CommonMark HTML block types 1 and 6 to `MarkdownPageMummifierTest` ([specification](#step-1-tests))
 
@@ -87,4 +87,4 @@ void testType1HtmlBlockNamespacePropagatesToDom() throws IOException {
 
 ## Skip / Do Not Touch
 
-- **CommonMark type 7 HTML blocks.** A complete open tag whose tag name is not in the type-1 or type-6 lists is a type-7 block, which alone among the block types cannot interrupt a paragraph and must be separated from preceding text by a blank line. Type 7 is the path a *custom-named* embedded element would take, rather than a namespaced attribute on a standard element. It is not the motivating case for `mx:content-mode` — which places namespaced attributes on standard HTML elements (types 1 and 6) — and is deliberately left untested here. A separate test would be warranted if custom namespaced *element names* embedded in Markdown become a supported authoring pattern.
+- **CommonMark type 7 HTML blocks.** A complete open tag whose tag name is not in the type-1 or type-6 lists is a type-7 block, which alone among the block types cannot interrupt a paragraph and must be separated from preceding text by a blank line. Type 7 is the path a *custom-named* embedded element would take, rather than a namespaced attribute on a standard element. It is not the motivating case for `mx:content-as` — which places namespaced attributes on standard HTML elements (types 1 and 6) — and is deliberately left untested here. A separate test would be warranted if custom namespaced *element names* embedded in Markdown become a supported authoring pattern.

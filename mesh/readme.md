@@ -26,6 +26,7 @@ The engine is composed of three pluggable layers:
 | `mx:iter-var` | Names the iteration state variable (default: `iter`), a `MeshIterator` with `current`, `index`, `first`, and `last` properties. | `mx:iter-var="loop"` |
 | `mx:text` | Replaces the element's text content with the expression result. | `<h1 mx:text="page.title">Placeholder</h1>` |
 | `mx:attr-*` | Sets or removes a non-namespaced attribute. `true` sets the attribute to its own name (HTML boolean attribute idiom); `false` or empty removes it; other values set the attribute text. | `<input mx:attr-disabled="isLocked"/>` |
+| `mx:content-as` | Declares how element text content is interpreted: `template` (default) scans character data for `^{…}` interpolation; `literal` passes it through unchanged. The setting is inherited by descendant content; a descendant may declare `mx:content-as="template"` to re-enable interpolation within a `literal` region. | `<pre mx:content-as="literal">HEAD^{tree}</pre>` |
 
 Text and attribute values also support inline interpolation using `^{expression}` syntax, e.g. `href="products/^{product.slug}"`.
 

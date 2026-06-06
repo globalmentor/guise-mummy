@@ -18,11 +18,14 @@ package dev.guise.mesh;
 
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.def.HTML.*;
+import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.xml.XmlDom.*;
+import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static dev.guise.mesh.GuiseMesh.*;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -297,6 +300,200 @@ public class GuiseMeshTest {
 		assertThat(comment.getData(), is("Result: Success"));
 		assertThat(new HtmlSerializer().serialize(document),
 				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><!--Result: Success--></body></html>"));
+	}
+
+	//## `mx:content-as`
+
+	/// Tests that [GuiseMesh#findContentAs(Element)] finds declared content interpretation: own declaration, ancestor inheritance, nearest-wins precedence, empty when none declared, and stamped orphan.
+	@Test
+	void testFindContentAs() {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element divElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "div"));
+		final Element spanElement = appendElement(divElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "span"));
+		assertThat("empty when none declared", GuiseMesh.findContentAs(divElement), is(Optional.empty()));
+		assertThat("child empty when none declared", GuiseMesh.findContentAs(spanElement), is(Optional.empty()));
+		setAttribute(divElement, ATTRIBUTE_CONTENT_AS, getSerializationName(ContentAs.LITERAL));
+		assertThat("own declaration found", GuiseMesh.findContentAs(divElement), isPresentAndIs(ContentAs.LITERAL));
+		assertThat("inherited from ancestor", GuiseMesh.findContentAs(spanElement), isPresentAndIs(ContentAs.LITERAL));
+		setAttribute(spanElement, ATTRIBUTE_CONTENT_AS, getSerializationName(ContentAs.TEMPLATE));
+		assertThat("nearest declaration wins over farther ancestor", GuiseMesh.findContentAs(spanElement), isPresentAndIs(ContentAs.TEMPLATE));
+		final Element orphanElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, "p");
+		setAttribute(orphanElement, ATTRIBUTE_CONTENT_AS, getSerializationName(ContentAs.LITERAL));
+		assertThat("stamped orphan resolves to stamped value", GuiseMesh.findContentAs(orphanElement), isPresentAndIs(ContentAs.LITERAL));
+	}
+
+	/// Tests that `mx:content-as="literal"` suppresses `^{…}` interpolation of direct character-data content, and that the attribute is excised from output.
+	@Test
+	void testMxContentAsLiteralSuppressesInterpolation() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element preElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "pre"), "git fetch origin HEAD^{tree}");
+		setAttribute(preElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.LITERAL));
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of()), document);
+		assertThat("literal text passes through unchanged", preElement.getTextContent(), is("git fetch origin HEAD^{tree}"));
+		assertThat("mx:content-as attribute is absent from output", preElement.hasAttributeNS(NAMESPACE_STRING, "content-as"), is(false));
+	}
+
+	/// Tests that `mx:content-as="literal"` is inherited by descendant element content.
+	@Test
+	void testMxContentAsLiteralInheritedByDescendants() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element divElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "div"));
+		setAttribute(divElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.LITERAL));
+		final Element preElement = appendElement(divElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "pre"));
+		final Element codeElement = appendElement(preElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "code"), "HEAD^{tree}");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of()), document);
+		assertThat("descendant text is not interpolated", codeElement.getTextContent(), is("HEAD^{tree}"));
+	}
+
+	/// Tests that an explicit `mx:content-as="template"` overrides an inherited `literal` from an ancestor, restoring interpolation.
+	@Test
+	void testMxContentAsTemplateOverridesInheritedLiteral() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element divElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "div"));
+		setAttribute(divElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.LITERAL));
+		final Element spanElement = appendElement(divElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "span"), "^{greeting}");
+		setAttribute(spanElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.TEMPLATE));
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("greeting", "Hello")), document);
+		assertThat("template override restores interpolation", spanElement.getTextContent(), is("Hello"));
+		assertThat("mx:content-as absent from output on override element", spanElement.hasAttributeNS(NAMESPACE_STRING, "content-as"), is(false));
+	}
+
+	/// Tests that `mx:content-as="literal"` does not affect interpolation of non-`mx:` attribute values.
+	@Test
+	void testMxContentAsLiteralDoesNotAffectAttributeInterpolation() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element aElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "a"), "HEAD^{tree}");
+		aElement.setAttributeNS(null, "href", "^{url}");
+		setAttribute(aElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.LITERAL));
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("url", "https://example.com")), document);
+		assertThat("text content is literal", aElement.getTextContent(), is("HEAD^{tree}"));
+		assertThat("attribute interpolation still occurs", aElement.getAttributeNS(null, "href"), is("https://example.com"));
+	}
+
+	/// Tests that `mx:content-as="literal"` does not suppress `mx:each` structural iteration.
+	@Test
+	void testMxContentAsLiteralDoesNotSuppressStructuralDirectives() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element ulElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL));
+		setAttribute(ulElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.LITERAL));
+		final Element liElement = appendElement(ulElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI), "^{it}");
+		setAttribute(liElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "items");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("items", List.of("a", "b", "c"))), document);
+		assertThat("structural iteration still produces correct element count with literal text", new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body>"
+						+ "<ul><li>^{it}</li><li>^{it}</li><li>^{it}</li></ul></body></html>"));
+	}
+
+	/// Tests that `mx:content-as="literal"` suppresses interpolation of CDATA and comment children.
+	@Test
+	void testMxContentAsLiteralSuppressesCdataAndComment() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element divElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "div"));
+		setAttribute(divElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.LITERAL));
+		final CDATASection cdataSection = document.createCDATASection("HEAD^{tree}");
+		divElement.appendChild(cdataSection);
+		final Comment comment = document.createComment("HEAD^{tree}");
+		divElement.appendChild(comment);
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of()), document);
+		assertThat("CDATA data is not interpolated", cdataSection.getData(), is("HEAD^{tree}"));
+		assertThat("comment data is not interpolated", comment.getData(), is("HEAD^{tree}"));
+	}
+
+	/// Tests that `mx:content-as="expression"` (reserved but not yet implemented) and an unknown value each throw [MeshException]: the former at usage, the latter at attribute discovery.
+	@Test
+	void testMxContentAsUnknownOrUnimplementedValueThrows() {
+		{
+			final Document document = createXHTMLDocument("Test");
+			final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+			final Element divElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "div"), "text");
+			setAttribute(divElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), "expression");
+			assertThrows(MeshException.class, () -> new GuiseMesh().meshDocument(MeshContext.create(Map.of()), document));
+		}
+		{
+			final Document document = createXHTMLDocument("Test");
+			final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+			final Element divElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "div"), "text");
+			setAttribute(divElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), "bogus-unsupported");
+			assertThrows(MeshException.class, () -> new GuiseMesh().meshDocument(MeshContext.create(Map.of()), document));
+		}
+	}
+
+	/// Tests that ordinary interpolation is unchanged in the absence of `mx:content-as`.
+	@Test
+	void testMxContentAsDefaultIsTemplate() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, "p"), "Result: ^{foo}");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", "Success")), document);
+		assertThat("interpolation still occurs with no mx:content-as", bodyElement.getTextContent(), is("Result: Success"));
+	}
+
+	/// Tests that `mx:content-as="literal"` declared on an ancestor is inherited by `mx:each` clones via clone-stamping.
+	@Test
+	void testMxContentAsLiteralInheritedByMxEachClones() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element ulElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL));
+		setAttribute(ulElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.LITERAL));
+		final Element liElement = appendElement(ulElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI), "^{it}");
+		setAttribute(liElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "items");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("items", List.of("a", "b"))), document);
+		assertThat("literal interpretation inherited from ancestor through clone boundary", new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body>" + "<ul><li>^{it}</li><li>^{it}</li></ul></body></html>"));
+	}
+
+	/// Tests that `mx:content-as="literal"` declared directly on the iterated element survives cloning.
+	@Test
+	void testMxContentAsLiteralOnIteratedElementSurvivesCloning() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element ulElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL));
+		final Element liElement = appendElement(ulElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI), "^{it}");
+		setAttribute(liElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "items");
+		setAttribute(liElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.LITERAL));
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("items", List.of("a", "b"))), document);
+		assertThat("literal on iterated element itself survives cloning", new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body>" + "<ul><li>^{it}</li><li>^{it}</li></ul></body></html>"));
+	}
+
+	/// Tests that `mx:content-as="template"` on an iterated element overrides an inherited `literal` from an ancestor on each clone.
+	@Test
+	void testMxContentAsTemplateOverrideOnIteratedElementInLiteralRegion() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element ulElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL));
+		setAttribute(ulElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.LITERAL));
+		final Element liElement = appendElement(ulElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI), "^{it}");
+		setAttribute(liElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "items");
+		setAttribute(liElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.TEMPLATE));
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("items", List.of("a", "b"))), document);
+		assertThat("template override on iterated element restores interpolation", new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body>" + "<ul><li>a</li><li>b</li></ul></body></html>"));
+	}
+
+	/// Tests that `mx:content-as="literal"` is preserved across two nested levels of `mx:each`.
+	@Test
+	void testMxContentAsLiteralInheritedAcrossTwoLevelsOfMxEach() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element outerUlElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL));
+		setAttribute(outerUlElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(ContentAs.LITERAL));
+		final Element outerLiElement = appendElement(outerUlElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI));
+		setAttribute(outerLiElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "outer");
+		final Element innerUlElement = appendElement(outerLiElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL));
+		final Element innerLiElement = appendElement(innerUlElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI), "^{it}");
+		setAttribute(innerLiElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "inner");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("outer", List.of("x"), "inner", List.of("A", "B"))), document);
+		assertThat("literal interpretation survives two nested mx:each clone boundaries", new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body>"
+						+ "<ul><li><ul><li>^{it}</li><li>^{it}</li></ul></li></ul></body></html>"));
 	}
 
 }
