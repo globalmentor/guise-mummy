@@ -11,7 +11,7 @@ The Guise™ Mummy project comprises several products and related utilities:
 
 ## Build
 
-Guise requires Java 11 and has been tested with the [OpenJDK 11](https://openjdk.java.net/projects/jdk/11/) on Windows 10. Building requires a recent version of [Apache Maven](https://maven.apache.org/).
+Guise requires Java 25 and has been tested with [Eclipse Adoptium Temurin OpenJDK 25](https://adoptium.net/temurin/releases/?version=25). Building requires a recent version of [Apache Maven](https://maven.apache.org/).
 
 Build Guise Mummy using the following command:
 
@@ -40,5 +40,7 @@ Guise usage is explained in each of the subprojects, listed above.
 Issues tracked by [JIRA](https://globalmentor.atlassian.net/projects/GUISE).
 
 ## Changelog
+
+_The changelog will be brought up to date in the future._
 
 - 0.1.0: First working release of Guise Mummy.

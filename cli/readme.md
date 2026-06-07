@@ -12,7 +12,7 @@ For building the entire Guise ecosystem and/or invoking the CLI see the document
 
 Use `guise help` for more details and options.
 
-_A primer on using the Guise CLI to generate a static site can be found in the instructions for [Guise Mummy](../mummy/).
+_A primer on using the Guise CLI to generate a static site can be found in the instructions for [Guise Mummy](../mummy/)._
 
 ## Issues
 

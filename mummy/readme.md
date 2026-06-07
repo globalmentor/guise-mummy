@@ -15,7 +15,7 @@ Guise Mummy takes source files of various types — XHTML, Markdown, images, and
 * **Example-based navigation.** Provide a sample navigation menu in your template — Guise Mummy will regenerate it for each page, applying the correct page names and active/inactive styles, just by looking at your example. No expression language required for this common task.
 * **Expression language.** For more complex needs, [Guise Mesh](#expression-language-guise-mesh) provides a full expression language (MEXL, backed by [Apache Commons JEXL](https://commons.apache.org/proper/commons-jexl/)) with iteration, attribute mutation, text replacement, and string interpolation — all expressed as standard XML attributes, keeping your templates valid XHTML.
 * **Semantic metadata.** Change a page property by updating a YAML front-matter header in Markdown or an HTML `<meta>` element in XHTML. Guise Mummy uses a simple but extensive semantic-based metadata framework, the [Uniform Resource Framework (URF)](https://urf.io/), throughout.
-* **Automated deployment.** A single `guise deploy` command uploads your site to [Amazon S3](https://aws.amazon.com/s3/) with [CloudFront](https://aws.amazon.com/cloudfront/) CDN distribution and [Route 53](https://aws.amazon.com/route53/) DNS management, preserving per-page metadata such as content type along the way.
+* **Automated deployment.** A single `guise deploy` command builds your site and uploads it to the cloud — for example to [Amazon S3](https://aws.amazon.com/s3/) with [CloudFront](https://aws.amazon.com/cloudfront/) CDN distribution and [Route 53](https://aws.amazon.com/route53/) DNS management — preserving per-page metadata such as content type along the way.
 * **Incremental mummification.** Only changed pages are regenerated on subsequent builds, with content fingerprints tracked for each artifact.
 
 ## Download
@@ -23,6 +23,23 @@ Guise Mummy takes source files of various types — XHTML, Markdown, images, and
 Guise Mummy is available in the Maven Central Repository as [dev.guise:guise-mummy](https://search.maven.org/search?q=g:dev.guise%20AND%20a:guise-mummy). For building the entire Guise ecosystem see the documentation for the parent [Guise Mummy project](../).
 
 ## Getting Started
+
+### Project Layout
+
+A Guise Mummy project follows a conventional directory structure:
+
+```
+my-site/
+├── guise-project.turf        # project configuration (optional)
+└── src/
+    └── site/                 # source tree — your authored content
+        ├── .template.xhtml   # shared page template (optional)
+        ├── index.md          # home page
+        ├── about.md
+        └── images/
+```
+
+Source files go under `src/site/` — pages are usually written in Markdown — and the generated site appears under `target/site/`. Only `src/site/` is required; project configuration and templates are optional.
 
 ### CLI
 
@@ -79,12 +96,45 @@ Read more [about](about.md) this site.
 #### File Naming Conventions
 
 * **Dotfiles** — Any file or directory starting with `.` is excluded from the generated site but may influence generation. For example `.template.xhtml` serves as a template (see [Templates](#templates)) but does not itself appear in the output.
-* **Veiled files** — A file or directory starting with `_` (underscore) _is_ included in the generated site but hidden from generated navigation menus. For example an `_assets/` directory containing `_assets/css/` and `_assets/js/` will still appear in the target site, but no "assets" menu item will be generated.
-* **Assets** — A file or directory starting with `$` (dollar sign) is included in the target site but excluded from both navigation and page processing. The asset designation suppresses page generation only — files that would otherwise be processed by a page mummifier (Markdown, XHTML, HTML) are instead handled by the default file mummifier. Other registered mummifiers (such as the image mummifier) still apply normally; for example, a large image in an asset directory may still be scaled.
+* **Veiled files** — A file or directory whose name starts with `_` (underscore) _is_ included in the generated site but hidden from generated navigation menus. The underscore is removed in the output name, so a `_drafts/` directory is published as `drafts/` — reachable in the site, but with no menu item generated for it.
+* **Assets** — A file or directory whose name starts with `$` (dollar sign) is included in the site but excluded from _both_ navigation and page processing. Like the veil marker, the `$` is removed in the output name, so a `$assets/` directory is published as `assets/`. The asset designation only suppresses page generation: a file that a page mummifier would process (Markdown, XHTML, HTML) is instead copied as-is, while other mummifiers still apply — a large image in an asset directory may still be scaled, for instance. Assets are the usual home for stylesheets, scripts, and fonts.
+
+### Page Metadata
+
+A page carries metadata that drives its title, navigation entry, ordering, and templating. Set it in YAML front matter (Markdown) or `<meta>` elements (XHTML).
+
+| Property | Purpose |
+|---|---|
+| `title` | The page title; used for `<title>` and as the default navigation label. |
+| `label` | Overrides the navigation label; falls back to `title` when absent. |
+| `icon` | An icon reference for the page, used in generated navigation. |
+| `mummy:order` | Orders the page among its siblings in computed navigation. |
+| `mummy:template` | The template to apply; an empty value opts the page out (see [Templates](#templates)). |
+
+In Markdown, properties appear in the front matter:
+
+```markdown
+---
+title: About Us
+label: About
+mummy:order: 20
+---
+```
+
+In XHTML, simple properties use `<meta name="…">`, while properties in the Mummy namespace use `<meta property="…">`:
+
+```html
+<meta name="label" content="About" />
+<meta property="mummy:order" content="20" />
+```
+
+In XHTML a Mummy-namespace name written in `kebab-case` is converted to `camelCase`, so `<meta property="mummy:alt-location" …>` sets the `mummy/altLocation` property.
 
 ### Templates
 
-Place a template file named `.template.xhtml` in any directory to apply it to every page _in that directory and its subdirectories_. The template provides the page skeleton — header, footer, navigation, stylesheets — while the page provides the content. Guise Mummy merges them by replacing the template's `<main>` content (or `<article>`, or `<body>` if neither is present) with the page's content.
+Place a template file named `.template.xhtml` in any directory to apply it to every page _in that directory and its subdirectories_. The template provides the page skeleton — header, footer, navigation, stylesheets — while each page provides only its content.
+
+Guise Mummy selects the page's content by taking its `<main>` element, or `<article>` if there is no `<main>`, or the whole `<body>` if neither is present. That content is merged into the matching element of the template. **Only the selected element is carried over — anything outside it, such as a page-specific header placed as a sibling of `<main>`, is discarded.** Content must therefore live inside the page's content element to survive templating.
 
 Guise Mummy features are controlled through elements and attributes in the `https://guise.dev/name/mummy/` XHTML namespace.
 
@@ -95,14 +145,14 @@ Guise Mummy features are controlled through elements and attributes in the `http
 <head>
   <meta charset="UTF-8" />
   <title>Example Template</title>
-  <link href="_assets/css/site.css" rel="stylesheet" />
+  <link href="$assets/css/site.css" rel="stylesheet" />
 </head>
 <body>
   <header>
     <nav>
       <ul mummy:regenerate="regenerate">
         <li class="active"><a class="disabled" href="">Foo</a></li>
-        <li><a href="about.xhtml">About</a></li>
+        <li><a href="about.md">About</a></li>
       </ul>
     </nav>
   </header>
@@ -113,18 +163,79 @@ Guise Mummy features are controlled through elements and attributes in the `http
 </html>
 ```
 
-#### Navigation Regeneration
+#### Opting Out of Templating
 
-The `mummy:regenerate` attribute on a `<ul>` or `<ol>` inside a `<nav>` element tells Guise Mummy to regenerate the list for each page. Guise Mummy infers the active and inactive menu item styles from the template's example items:
+A page that already carries its own complete chrome can opt out of templating by declaring an empty template:
 
-* A link with `href=""` (the empty string) marks the **active/self** item template — the style applied to the current page's menu entry.
-* The first item with a non-empty (or absent) `href` marks the **inactive** item template — the style applied to all other menu entries.
+```html
+<meta property="mummy:template" content="" />
+```
 
-No expression language is needed to mark menu items as "active" or "disabled". Guise Mummy determines this automatically.
+An empty value resolves to the page's own source path, which Guise Mummy treats as "this page is its own template" — so no ancestor template is applied and the page is emitted as authored. A page with no `mummy:template` property is templated normally by the nearest ancestor `.template.xhtml`.
 
 #### Template Link Retargeting
 
-Stylesheet links, script references, and other resource URLs in the template are automatically retargeted when the template is applied to pages in subdirectories. A `<link href="_assets/css/site.css" …/>` in a root template becomes `../_assets/css/site.css` for a page one level deep, and so on.
+Resource URLs in the template — stylesheet links, script and image references — are relative to the template, and Guise Mummy retargets them to each consuming page's location. The template's `href="$assets/css/site.css"` is emitted as `assets/css/site.css` for a root-level page and `../assets/css/site.css` for a page one directory deep, relativized per page (the `$` asset marker is removed in the output, as described under [Internal Links](#internal-links)).
+
+### Navigation
+
+A template's navigation menu is regenerated for each page from the site's structure, so the menu stays current as pages are added or removed.
+
+#### Regenerating a Menu
+
+Mark a `<ul>` or `<ol>` inside a `<nav>` with `mummy:regenerate="regenerate"` and provide one or two example items; Guise Mummy rebuilds the list for each page, inferring the styles from the examples:
+
+* A link with `href=""` (the empty string) marks the **active/self** item — the style applied to the current page's own entry.
+* The first item with a non-empty (or absent) `href` marks the **inactive** item — the style applied to every other entry.
+
+No expression language is needed to mark items active or inactive; Guise Mummy determines this automatically. If menu items carry icons, place an empty `<i></i>` inside an item's link to mark where the icon goes — Guise Mummy fills it with the linked page's `icon`, or removes it when the page has none.
+
+#### Defining Navigation
+
+By default the regenerated menu is computed for each page from its own section — the parent collection and the sibling pages at that level, ordered by the `mummy:order` property and then by name. To control a menu explicitly, place a `.navigation.lst` file in a directory, naming one artifact per line in menu order:
+
+```
+./
+about/
+products/
+contact.md
+```
+
+A navigation file **replaces** the computed menu entirely, governing both order and membership: an artifact omitted from the file is left out of the menu, though it remains reachable by link. Navigation is resolved per page from the nearest navigation file found searching upward to the site root, so a single `.navigation.lst` at `src/site/` governs the whole site, while one in a subdirectory overrides it for that subtree. A richer `.navigation.turf` form (which takes precedence when both exist) allows external links, custom labels, and icons; a `.navigation+.lst` (note the `+`) _appends_ to the inherited menu rather than replacing it.
+
+After adding, moving, or editing a navigation file, rebuild fully (`guise mummify --full`): incremental builds do not always detect that a changed navigation file has left other pages' menus stale.
+
+### Internal Links
+
+Write links between pages as references to the **source** file, including its extension — `about.md`, `../products/index.xhtml`, `images/photo.jpg`. Guise Mummy resolves each relative reference to its source artifact and rewrites it to that artifact's output URL, relative to the page being generated, applying clean-URL stripping and other renaming automatically. You never write the output form yourself, and a link keeps working wherever a shared template places it in the hierarchy.
+
+This retargeting applies to **relative** references only. Root-absolute references (`/about/`) and full URLs (`https://…`) pass through untouched — they are neither resolved against the source tree nor validated — so relative references are preferred for internal links. A relative reference that matches no source artifact is left unchanged and logged as a warning. See the [architecture document](architecture.md) for the underlying source-to-target model.
+
+### Redirects
+
+To make an alternate location redirect to a page, declare the `mummy/altLocation` property on the page itself — the canonical target — as a reference relative to that page. In XHTML:
+
+```html
+<meta property="mummy:alt-location" content="../old-name" />
+```
+
+or in Markdown front matter:
+
+```markdown
+mummy:altLocation: ../old-name
+```
+
+At deployment, the configured deploy target generates an HTTP redirect from the alternate location to the page. Redirects materialize at deploy time only; a local build has nothing to redirect.
+
+### Blogs
+
+Guise Mummy has lightweight support for date-based posts. A source file whose name begins with a date — `@YYYY-MM-DD-slug.md` — is recognized as a post and generates a dated output path (`YYYY/MM/DD/slug`). To present a series of posts as summaries in reverse-chronological order, add a directory widget to the listing page:
+
+```html
+<mummy:directory archetype="blog" />
+```
+
+The widget lists the posts in its directory; the `blog` archetype sorts them newest-first. No scaffolding is needed in advance — the listing fills in as posts are added.
 
 ### Expression Language (Guise Mesh)
 
@@ -140,14 +251,13 @@ For dynamic content beyond template application, Guise Mummy includes [Guise Mes
 
 #### Attributes
 
-| Attribute | Purpose |
-|---|---|
-| `mx:each` | Iterates over a collection, cloning the host element for each item |
-| `mx:item-var` | Names the iteration item variable (default: `it`) |
-| `mx:index-var` | Names the iteration index variable (default: `i`) |
-| `mx:iter-var` | Names the iteration state variable (default: `iter`), exposing `.first`, `.last`, `.current`, `.index` |
-| `mx:text` | Replaces the element's text content with the expression result |
-| `mx:attr-*name*` | Sets attribute *name* on the element; `false` removes it, `true` sets it as a boolean attribute |
+Guise Mesh transforms a page through `mx:`-namespaced attributes — `mx:each` to repeat an element for each item of a collection, `mx:text` to replace an element's text from an expression, `mx:attr-*` to set attributes, and `mx:content-as` to control whether an element's text is interpolated or taken literally. Because these are ordinary XML attributes, the template stays valid XHTML. For example, to repeat a list item for each product:
+
+```html
+<li mx:each="products"><a href="^{it.url}" mx:text="it.name">Product</a></li>
+```
+
+See the [Guise Mesh documentation](../mesh/) for the full attribute reference.
 
 #### String Interpolation
 
@@ -179,19 +289,9 @@ When you run `guise mummify` (or any command that includes mummification), Guise
 
 ### Page Processing Pipeline
 
-For page artifacts (XHTML, Markdown), `AbstractPageMummifier` orchestrates the following pipeline:
+Each page — whether authored as XHTML or Markdown — is first parsed into an in-memory XHTML DOM, then carried through an ordered sequence: the ancestor template is applied, [Guise Mesh](#expression-language-guise-mesh) expressions are evaluated, `mummy:regenerate` navigation menus are rebuilt, links are retargeted from source to output paths, Guise Mummy markup is stripped, metadata is written back as `<meta>` elements, and the result is serialized as HTML5. The order matters: templating runs before link retargeting, which is why a link authored in a template resolves correctly for every page that uses it. The [architecture document](architecture.md) describes each step in full.
 
-1. **Load** — The source file is loaded and parsed into an in-memory XHTML DOM, regardless of its original format. A Markdown file becomes an XHTML DOM just as an `.xhtml` file does.
-2. **Normalize** — The DOM is tidied: named `<meta>` elements are removed (they are regenerated later during Ascribe).
-3. **Apply Template** — If a `.template.*` file is present in the page's directory or any ancestor directory, it is loaded, its links are relocated to the page's source location, and the page's content is merged into the template's `<main>` (or `<article>`, or `<body>`).
-4. **Mesh** — [Guise Mesh](#expression-language-guise-mesh) expressions are evaluated: `mx:each` iteration, `mx:attr-*` attribute mutations, `mx:text` replacements, and `^{…}` string interpolation.
-5. **Process** — Registered widgets are dispatched and `mummy:regenerate` navigation lists are rebuilt.
-6. **Relocate** — All link references (`href`, `src`, etc.) are retargeted from source paths to target paths. A link to `example.md` becomes `example.html`; relative paths are recalculated for the artifact's target location.
-7. **Cleanse** — All Guise Mummy namespace elements and attributes (`mummy:*`, `xmlns:mummy`) are stripped from the output.
-8. **Ascribe** — Artifact metadata is written back into the HTML as `<meta>` elements (title, author, generator, generation timestamp).
-9. **Save** — The final XHTML DOM is serialized as an HTML5 document.
-
-Not all mummifiers follow this pipeline. A `GenericFileMummifier` (the default fallback) copies unrecognized file types (CSS, JavaScript, fonts, etc.) to the target unchanged, determining media type from the filename extension. `OpaqueFileMummifier` does the same without media type detection. Image mummifiers may perform optimization without DOM processing.
+Not every file is a page. Stylesheets, scripts, fonts, and other files are copied to the target unchanged (with their media type detected from the extension), and images may be optimized — none of these go through the DOM pipeline above.
 
 ### Design Highlights
 
@@ -242,6 +342,12 @@ A typical project configuration:
 | `mummy.textOutputLineSeparator` | `\n` | Line separator for reproducible output |
 
 See the [architecture document](architecture.md) for the full configuration reference, deployment configuration, and the description/metadata system.
+
+## Deployment
+
+Deployment targets are configured in the `deploy` section of `guise-project.turf`, and `guise deploy` builds the site and pushes it to each configured target, preserving per-page metadata such as content type. Guise Mummy can deploy to [Amazon S3](https://aws.amazon.com/s3/) — as a plain bucket or an S3 static website — front it with a [CloudFront](https://aws.amazon.com/cloudfront/) distribution, and manage DNS with [Route 53](https://aws.amazon.com/route53/). It can also deploy to a [Flange](https://flange.dev/)-managed environment, which provisions an S3 and CloudFront site with built-in redirect support.
+
+See the [architecture document](architecture.md) for the deployment lifecycle and target configuration.
 
 ## Migration
 
