@@ -26,8 +26,24 @@ The engine is composed of three pluggable layers:
 | `mx:iter-var` | Names the iteration state variable (default: `iter`), a `MeshIterator` with `current`, `index`, `first`, and `last` properties. | `mx:iter-var="loop"` |
 | `mx:text` | Replaces the element's text content with the expression result. | `<h1 mx:text="page.title">Placeholder</h1>` |
 | `mx:attr-*` | Sets or removes a non-namespaced attribute. `true` sets the attribute to its own name (HTML boolean attribute idiom); `false` or empty removes it; other values set the attribute text. | `<input mx:attr-disabled="isLocked"/>` |
+| `mx:content-as` | Declares how element text content is interpreted: `template` (default) scans character data for `^{…}` interpolation; `literal` passes it through unchanged. The setting is inherited by descendant content; a descendant may declare `mx:content-as="template"` to re-enable interpolation within a `literal` region. | `<pre mx:content-as="literal">HEAD^{tree}</pre>` |
 
 Text and attribute values also support inline interpolation using `^{expression}` syntax, e.g. `href="products/^{product.slug}"`.
+
+## Content Interpretation
+
+By default, Guise Mesh treats an element's text as a **template**: it scans the character data for `^{…}` markers and interpolates them. The `mx:content-as` attribute changes this interpretation for an element and its descendants:
+
+- `template` (the default) — scan the text for `^{…}` expressions and interpolate them.
+- `literal` — take the text exactly as written; `^{…}` sequences are left untouched.
+
+This matters whenever literal text would otherwise look like an expression. A code sample such as `git cat-file -p HEAD^{tree}` contains `^{tree}`, which Mesh would try to interpolate; marking its container `literal` passes it through verbatim:
+
+```html
+<pre mx:content-as="literal"><code>git cat-file -p HEAD^{tree}</code></pre>
+```
+
+The setting is inherited down the subtree, so wrapping a region once governs all the text within it, including nested elements; a descendant can re-establish interpolation by declaring `mx:content-as="template"` on itself. Content interpretation governs element text only — it does not affect attribute interpolation (an `href="^{url}"` is still interpolated), nor the structural `mx:` directives, which continue to operate within a `literal` region.
 
 ## Getting Started
 

@@ -17,6 +17,8 @@
 package dev.guise.mesh;
 
 import static com.globalmentor.io.IO.*;
+import static com.globalmentor.java.Enums.*;
+import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static java.util.Objects.*;
 import static java.util.function.Predicate.*;
@@ -35,6 +37,7 @@ import org.jspecify.annotations.*;
 
 import org.w3c.dom.*;
 
+import com.globalmentor.lex.Identifier;
 import com.globalmentor.xml.def.NsName;
 
 /// Guise template transformation engine.
@@ -66,6 +69,25 @@ public class GuiseMesh {
 
 	/// The attribute `mx:text` for text replacement.
 	public static final NsName ATTRIBUTE_TEXT = NsName.of(NAMESPACE_STRING, "text");
+
+	/// The attribute `mx:content-as` for selecting how an element's textual content is interpreted.
+	/// @see ContentAs
+	public static final NsName ATTRIBUTE_CONTENT_AS = NsName.of(NAMESPACE_STRING, "content-as");
+
+	/// The value space of the `mx:content-as` attribute, declaring how Mesh interprets the textual content of an element.
+	/// @see #ATTRIBUTE_CONTENT_AS
+	public enum ContentAs implements Identifier {
+
+		/// The content is a Mesh template: character data is scanned for `^{…}` and interpolated. This is the default and the engine's historical behavior.
+		TEMPLATE,
+
+		/// The content stands for itself: no interpolation is performed, and `^{…}` sequences pass through unchanged.
+		LITERAL,
+
+		/// The content is a single MEXL expression whose evaluated result replaces the content. *(Reserved; not yet implemented.)*
+		EXPRESSION;
+
+	}
 
 	//# attribute mutations
 
@@ -182,6 +204,11 @@ public class GuiseMesh {
 								context.setVariable(itemVar, item);
 								context.setVariable(indexVar, iterator.getIndex());
 								final Element eachElement = (Element)element.cloneNode(true); //mesh a clone of this element; iteration attribute have been removed
+								// Stamp the effective content interpretation so the clone carries it regardless of detachment.
+								// Pragmatically assumes `NAMESPACE_PREFIX` is the declared prefix for the `mx:` namespace, which works irrespective of the actual
+								// prefix: the attribute is a transient DOM marker, lookup is prefix-agnostic, and the attribute is excised before serialization.
+								//TODO consider carrying content interpretation in MeshContext (e.g. via nestScope()) instead of stamping the DOM, decoupling traversal-scoped state from the DOM entirely.
+								setAttribute(eachElement, ATTRIBUTE_CONTENT_AS.withPrefix(NAMESPACE_PREFIX), getSerializationName(findContentAs(element).orElse(ContentAs.TEMPLATE)));
 								result.addAll(meshElement(context, eachElement));
 							}
 						}
@@ -243,7 +270,9 @@ public class GuiseMesh {
 
 		meshChildNodes(context, element);
 
-		//TODO remove all mx-related attributes
+		exciseAttribute(element, ATTRIBUTE_CONTENT_AS); //mx:content-as; deferred until after child processing, because removing it earlier would prevent descendants from finding it during ancestor-walk inheritance
+
+		//TODO defensively remove any remaining unrecognized mx:-namespaced attributes (all recognized ones are already excised above at the point of consumption)
 
 		return List.of(element);
 	}
@@ -265,17 +294,45 @@ public class GuiseMesh {
 	public void meshChildNodes(@NonNull MeshContext context, @NonNull final Element element) throws IOException, MeshException, DOMException {
 		final MeshInterpolator interpolator = getInterpolator();
 		final MexlEvaluator evaluator = getEvaluator();
+		final ContentAs contentAs = findContentAs(element).orElse(ContentAs.TEMPLATE);
+		final boolean interpolateContent = switch(contentAs) {
+			case TEMPLATE -> true;
+			case LITERAL -> false;
+			case EXPRESSION -> throw new MeshException("`mx:content-as` value `expression` is not yet implemented.");
+		};
 		final NodeList childNodes = element.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength(); childNodeIndex++) {
 			final Node childNode = childNodes.item(childNodeIndex);
 			if(childNode instanceof CharacterData childCharacterData) { //Text, Comment, or CDATA
-				interpolator.findInterpolation(context, childCharacterData.getData(), evaluator).map(Object::toString).ifPresent(childCharacterData::setData);
+				if(interpolateContent) {
+					interpolator.findInterpolation(context, childCharacterData.getData(), evaluator).map(Object::toString).ifPresent(childCharacterData::setData);
+				}
 			} else if(childNode instanceof Element childElement) {
 				final List<Element> meshedElements = meshElement(context, childElement);
 				replaceChild(element, childElement, meshedElements);
 				childNodeIndex += meshedElements.size() - 1; //adjust the index based upon the number of replaced elements (by default the loop advances by one)
 			}
 		}
+	}
+
+	/// Finds the declared `mx:content-as` content interpretation for an element, inheriting from the nearest ancestor that declares one.
+	/// @param element The element whose declared content interpretation is desired.
+	/// @return The nearest declared `mx:content-as` value walking up the ancestor chain, or an empty [Optional] if none is declared.
+	/// @throws MeshException if the attribute is present but its value is not a recognized [ContentAs] serialization.
+	static Optional<ContentAs> findContentAs(@NonNull final Element element) { //TODO extract a general `findAncestorAttribute(Element, NsName)` utility into `XmlDom`.
+		Element current = element;
+		do {
+			final Optional<String> foundRawValue = findAttribute(current, ATTRIBUTE_CONTENT_AS);
+			if(foundRawValue.isPresent()) {
+				try {
+					return Optional.of(getSerializedEnum(ContentAs.class, foundRawValue.get()));
+				} catch(final IllegalArgumentException illegalArgumentException) {
+					throw new MeshException("`mx:content-as` value `%s` is not recognized.".formatted(foundRawValue.get()), illegalArgumentException);
+				}
+			}
+			current = asInstance(current.getParentNode(), Element.class).orElse(null);
+		} while(current != null);
+		return Optional.empty();
 	}
 
 }

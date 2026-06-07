@@ -166,7 +166,7 @@ artifact instanceof CollectionArtifact ? toCollectionURI(artifactTargetPathUri) 
 
 `URIs.toCollectionURI(URI)` appends `/` to the URI path if not already present. The corresponding `URIPath` method is `toCollectionURIPath()`.
 
-The `toCollectionURI` compensation is load-bearing during PLAN — target directories do not yet exist, so `Path.toUri()` produces a URI without a trailing slash — and a no-op during DEPLOY, where the MUMMIFY phase has already created the directories and `Path.toUri()` includes the slash. Code that may run in any phase should apply the compensation unconditionally.
+The `toCollectionURI` compensation is required during PLAN — target directories do not yet exist, so `Path.toUri()` produces a URI without a trailing slash — and a no-op during DEPLOY, where the MUMMIFY phase has already created the directories and `Path.toUri()` includes the slash. Code that may run in any phase should apply the compensation unconditionally.
 
 This lifecycle dependence explains why different parts of the codebase handle the same concern differently:
 
@@ -223,6 +223,22 @@ Mummifiers are registered by filename extension in `BaseMummyContext`. Lookup us
 `OpaqueFileMummifier` remains available for cases where even extension-based media type detection is undesirable.
 
 Custom mummifiers can be registered via `GuiseMummy.addFileMummifierType()` before mummification begins.
+
+### Page Processing Pipeline
+
+`AbstractPageMummifier` processes page artifacts (XHTML, Markdown, HTML) through a fixed sequence of steps. Each step operates on an in-memory XHTML DOM, so a page's original format matters only at the first step.
+
+1. **Load** — The source file is parsed into an XHTML DOM regardless of its original format; a Markdown file becomes an XHTML DOM just as an `.xhtml` file does. A new source format need only implement this step — every later step then works unchanged.
+2. **Normalize** — The DOM is tidied, and named `<meta>` elements are removed (they are regenerated during Ascribe).
+3. **Apply Template** — If a `.template.*` file is present in the page's directory or an ancestor, it is loaded, its references are relocated (see Relocate), and the page's content element (`<main>`, else `<article>`, else `<body>`) is merged into the template's corresponding element. Markup outside the page's content element is discarded. A page whose `mummy/template` resolves to its own source path is treated as its own template, so this step is skipped.
+4. **Mesh** — Guise Mesh evaluates `mx:` directives and `^{…}` interpolation.
+5. **Process** — Registered widgets are dispatched and `mummy:regenerate` navigation lists are rebuilt from the navigation resolved for the page.
+6. **Relocate** — Reference elements (`<a href>`, `<img src>`, `<link href>`, …) are retargeted from source to target. Each relative reference is resolved to a source artifact and re-emitted as that artifact's output reference relative to the page — the source-to-target mapping described under [Resource References](#resource-references). Root-absolute and scheme references pass through untouched.
+7. **Cleanse** — Guise Mummy namespace elements and attributes (`mummy:*`, `xmlns:mummy`) are stripped from the output.
+8. **Ascribe** — Artifact metadata is written back as `<meta>` elements (title, author, generator, generation timestamp).
+9. **Save** — The DOM is serialized as an HTML5 document.
+
+Because Apply Template (step 3) runs before Relocate (step 6), a reference authored in a shared template is resolved against the template's own location and then re-emitted relative to each consuming page — the mechanism behind template link retargeting. Non-page artifacts do not follow this pipeline: `GenericFileMummifier` copies a file unchanged while detecting its media type from the extension, `OpaqueFileMummifier` does so without media-type detection, and image mummifiers may optimize without DOM processing.
 
 ## Description and Metadata System
 
@@ -296,7 +312,7 @@ From highest to lowest priority:
 
 ### Deployment Configuration
 
-Deployment is configured via `deploy.dns` (DNS provider) and `deploy.targets` (collection of deployment target sections). Each target section has a type (`S3`, `S3Website`, `CloudFront`) and target-specific properties.
+Deployment is configured via `deploy.dns` (DNS provider) and `deploy.targets` (collection of deployment target sections). Each target section has a type — `S3`, `S3Website`, `CloudFront`, or `FlangeWebSite` — and target-specific properties. `FlangeWebSite` deploys to a [Flange](https://flange.dev/)-managed environment (S3 fronted by CloudFront, using a CloudFront KeyValueStore for redirects); it resolves its infrastructure during PREPARE_DEPLOY rather than provisioning AWS resources directly.
 
 ## Lifecycle
 
@@ -330,7 +346,7 @@ Recursively invokes each artifact's mummifier. For file artifacts, `AbstractFile
 
 ### PREPARE_DEPLOY
 
-Loads DNS and deployment target configurations from the project configuration. Creates `Route53`, `S3`, `S3Website`, and/or `CloudFront` instances. Calls `prepare()` on each, which provisions or validates infrastructure (buckets, distributions, certificates, hosted zones).
+Loads DNS and deployment target configurations from the project configuration. Creates `Route53`, `S3`, `S3Website`, `CloudFront`, and/or `FlangeWebSite` instances. Calls `prepare()` on each, which provisions or validates infrastructure (buckets, distributions, certificates, hosted zones, Flange-managed environments).
 
 ### DEPLOY
 
